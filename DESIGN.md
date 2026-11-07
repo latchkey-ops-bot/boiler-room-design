@@ -229,11 +229,7 @@ Motion moves in frames, not curves, like a sprite and like the video renderer.
 
 ## Open questions for review
 
-1. **The launch wall.** Is a public wall of launches the community piece you want, or should it be
-   a list, a Discord, or nothing yet? It needs real launches before it goes live.
-2. **The steam.** It is a two-bump cloud. Try a rising trail of puffs instead?
-3. **The pixel size.** 3px reads as chunky and cute. 2px would be calmer for the dashboard.
-4. **Pink for "needs you".** It ties to the mascot's blush. Coral would read more urgent.
+None open. The four questions from the first review were decided on 2026-11-07 and are logged below.
 
 ## Decisions
 
@@ -247,6 +243,10 @@ Motion moves in frames, not curves, like a sprite and like the video renderer.
 | 2026-11-07 | Launch wall and launch countdown in the samples | The founder community angle, and how founders think about time |
 | 2026-11-07 | A boiler mascot with a play-button belly | Says "boiler" and "video" in one shape |
 | 2026-11-07 | The mascot is named Boyle | A boiler pun that also nods to Boyle's law of pressure, chosen by the founder |
+| 2026-11-07 | The launch wall becomes an opt-in showcase of real films | Founders choose to appear when their film is delivered, and Boiler Room's own film goes first. No cheering or posting yet. It doubles as marketing the GTM agents can run |
+| 2026-11-07 | Steam: the cloud stays in the logo, a rising trail of puffs plays in motion | The cloud stays clean at favicon size. Rising steam means the crew is working on a film |
+| 2026-11-07 | The pixel is 3px on the marketing site and 2px in the dashboard | Chunky and cute where we sell, calmer where customers work every day. Set `--br-px` per surface |
+| 2026-11-07 | Pink stays the "needs you" colour | Coral sits too close to the existing "failed" red and would read as an error |
 | 2026-11-07 | Notched frames and hard shadows, 3px pixel | The pixel look, built with CSS anyone can apply |
 | 2026-11-07 | Motion in 12fps steps | Pixel art moves in frames, and it matches the renderer's rule |
 | 2026-11-07 | Every number shows its source | The product's claims rule, made visible |
