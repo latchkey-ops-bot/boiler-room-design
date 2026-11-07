@@ -30,7 +30,7 @@ tools go dark.
 
 From [latchkey.dev](https://latchkey.dev) it keeps square corners, hard offset shadows on buttons,
 numbered labels like `01 · HOW IT WORKS` and JetBrains Mono for labels and data. It changes the
-rest: light instead of black, real pixel art instead of isometric tiles, and a mascot.
+rest: light instead of black, real pixel art instead of isometric tiles, and a mascot named Boyle.
 
 **Pixel art, readable words.** The mascot, icons, frames, shadows and big numbers are pixels. Every
 word you read is set in a smooth face, so the page stays easy to read at any size.
@@ -231,10 +231,9 @@ Motion moves in frames, not curves, like a sprite and like the video renderer.
 
 1. **The launch wall.** Is a public wall of launches the community piece you want, or should it be
    a list, a Discord, or nothing yet? It needs real launches before it goes live.
-2. **The mascot's name.** It doesn't have one yet.
-3. **The steam.** It is a two-bump cloud. Try a rising trail of puffs instead?
-4. **The pixel size.** 3px reads as chunky and cute. 2px would be calmer for the dashboard.
-5. **Pink for "needs you".** It ties to the mascot's blush. Coral would read more urgent.
+2. **The steam.** It is a two-bump cloud. Try a rising trail of puffs instead?
+3. **The pixel size.** 3px reads as chunky and cute. 2px would be calmer for the dashboard.
+4. **Pink for "needs you".** It ties to the mascot's blush. Coral would read more urgent.
 
 ## Decisions
 
@@ -247,6 +246,7 @@ Motion moves in frames, not curves, like a sprite and like the video renderer.
 | 2026-11-07 | Founders in launch week are the audience | They are who we're targeting. Copy talks about launch day and channels |
 | 2026-11-07 | Launch wall and launch countdown in the samples | The founder community angle, and how founders think about time |
 | 2026-11-07 | A boiler mascot with a play-button belly | Says "boiler" and "video" in one shape |
+| 2026-11-07 | The mascot is named Boyle | A boiler pun that also nods to Boyle's law of pressure, chosen by the founder |
 | 2026-11-07 | Notched frames and hard shadows, 3px pixel | The pixel look, built with CSS anyone can apply |
 | 2026-11-07 | Motion in 12fps steps | Pixel art moves in frames, and it matches the renderer's rule |
 | 2026-11-07 | Every number shows its source | The product's claims rule, made visible |
