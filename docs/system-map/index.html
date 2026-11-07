@@ -29,9 +29,10 @@
 
     /* Autonomy set */
     --auto-agent: #4a5478;
-    --auto-approval: #6b3db0;
     --auto-customer: #0b6e7e;
-    --auto-human: #b0244e;
+
+    /* The warning shown when the data and the drawings stop matching */
+    --alert: #b0244e;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -50,9 +51,8 @@
       --status-planned: #a8a79f;
       --status-decide: #f1b04f;
       --auto-agent: #aeb6d0;
-      --auto-approval: #bb9ff2;
       --auto-customer: #52c6d7;
-      --auto-human: #f27ea0;
+      --alert: #f27ea0;
     }
   }
   :root[data-theme="dark"] {
@@ -71,9 +71,8 @@
     --status-planned: #a8a79f;
     --status-decide: #f1b04f;
     --auto-agent: #aeb6d0;
-    --auto-approval: #bb9ff2;
     --auto-customer: #52c6d7;
-    --auto-human: #f27ea0;
+    --alert: #f27ea0;
   }
 
   * { box-sizing: border-box; }
@@ -102,7 +101,7 @@
   }
 
   .problems {
-    border: 2px solid var(--auto-human); background: var(--surface); border-radius: 8px;
+    border: 2px solid var(--alert); background: var(--surface); border-radius: 8px;
     padding: 10px 14px; font-weight: 600;
   }
   .problems[hidden] { display: none; }
@@ -157,7 +156,7 @@
   .name { font: 600 14.5px var(--font-sans); fill: var(--ink); }
   .owner { font: 600 12.5px var(--font-sans); fill: var(--ink); }
   .detail { font: 400 12.5px var(--font-sans); fill: var(--ink-2); }
-  .open-note { font: 600 12.5px var(--font-sans); fill: var(--ink); }
+  .when { font: 600 12.5px var(--font-sans); fill: var(--ink); }
   .detail .mono, .edge-label .mono { font-family: var(--font-mono); font-size: 11.5px; }
   .edge-label { font: 500 12px var(--font-sans); fill: var(--ink-2); }
   .lane { font: 700 11px var(--font-sans); letter-spacing: .08em; fill: var(--ink-2); }
@@ -187,18 +186,14 @@
   [data-status="planned"] > .card { fill: var(--surface-2); stroke: var(--status-planned); stroke-width: 1.75; stroke-dasharray: .5 5; stroke-linecap: round; }
   [data-status="decide"] > .card { fill: var(--surface-2); stroke: var(--status-decide); stroke-width: 2.5; stroke-dasharray: 14 4 3 4; }
 
-  /* Autonomy drives the left stripe: solid, hatched, dotted or crossed. It is the design, not
-     the truth, so it stays faint until the part is live. No level means no stripe. */
+  /* Autonomy drives the left stripe: solid or dotted. It is the design, not the truth, so it
+     stays faint until the part is live. No level means no stripe. */
   [data-autonomy="agent"] > .stripe { fill: var(--auto-agent); }
-  [data-autonomy="approval"] > .stripe { fill: url(#pattern-approval); }
   [data-autonomy="customer"] > .stripe { fill: url(#pattern-customer); }
-  [data-autonomy="human"] > .stripe { fill: url(#pattern-human); }
-  [data-status="planned"] > .stripe, [data-status="decide"] > .stripe { opacity: .4; }
-  /* Patterns carry less ink than the solid stripe, so they need more opacity to stay readable. */
-  :is([data-status="planned"], [data-status="decide"]):is([data-autonomy="approval"], [data-autonomy="customer"], [data-autonomy="human"]) > .stripe { opacity: .65; }
-  .pat-approval { stroke: var(--auto-approval); stroke-width: 2.5; }
+  [data-autonomy]:not([data-status="live"]) > .stripe { opacity: .4; }
+  /* Dots carry less ink than the solid stripe, so they need more opacity to stay readable. */
+  [data-autonomy="customer"]:not([data-status="live"]) > .stripe { opacity: .65; }
   .pat-customer { fill: var(--auto-customer); }
-  .pat-human { stroke: var(--auto-human); stroke-width: 1.75; }
 
   /* Chips */
   .chip-bg { stroke-width: 1.25; }
@@ -213,28 +208,22 @@
   .chip[data-value="decide"] .chip-bg { fill: var(--status-decide); stroke: var(--status-decide); }
   .chip[data-value="agent"] { color: var(--auto-agent); }
   .chip[data-value="agent"] .chip-bg { fill: var(--surface); stroke: var(--auto-agent); }
-  .chip[data-value="approval"] { color: var(--auto-approval); }
-  .chip[data-value="approval"] .chip-bg { fill: var(--surface); stroke: var(--auto-approval); }
   .chip[data-value="customer"] { color: var(--auto-customer); }
   .chip[data-value="customer"] .chip-bg { fill: var(--surface); stroke: var(--auto-customer); }
-  .chip[data-value="human"] { color: var(--on-fill); }
-  .chip[data-value="human"] .chip-bg { fill: var(--auto-human); stroke: var(--auto-human); }
   /* Away from a live part the autonomy chip loses its pill, so the status chip outweighs it. */
   .chip[data-quiet] .chip-bg { fill: none; stroke: none; }
   .chip[data-quiet] .chip-text { font-weight: 600; }
-  .chip[data-quiet][data-value="human"] { color: var(--auto-human); }
   .glyph-fill { fill: currentColor; }
   .glyph-line { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* Diagram 2: the human boundary */
-  .zone { fill: none; stroke: var(--auto-human); stroke-width: 2.5; stroke-dasharray: 12 6; }
-  .zone-title { font: 700 14px var(--font-sans); letter-spacing: .08em; fill: var(--auto-human); }
+  /* Diagram 2: the company layer and the customer boundary */
+  .band { fill: var(--surface); }
+  .band-title { font: 700 14px var(--font-sans); letter-spacing: .08em; fill: var(--ink); }
+  .zone { fill: none; stroke: var(--auto-customer); stroke-width: 2.5; stroke-dasharray: 12 6; }
+  .zone-title { font: 700 14px var(--font-sans); letter-spacing: .08em; fill: var(--auto-customer); }
   .zone-note { font: 400 13px var(--font-sans); fill: var(--ink-2); }
-  .zone-founder { font: 700 13px var(--font-sans); fill: var(--ink); }
-  .tab { color: var(--auto-human); }
-  .tab[data-who="customer"] { color: var(--auto-customer); }
+  .tab { color: var(--auto-customer); }
   .tab-box { fill: var(--surface-2); stroke: currentColor; stroke-width: 2; }
-  .tab-link { fill: none; stroke: currentColor; stroke-width: 2; }
   .tab-text { font: 700 12px var(--font-sans); fill: var(--ink); }
 
   /* Guard rails */
@@ -274,15 +263,8 @@
     <marker id="arrow-loop" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" orient="auto">
       <path class="arrow-open" d="M1.5 1 L9 5 L1.5 9"/>
     </marker>
-    <pattern id="pattern-approval" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
-      <line class="pat-approval" x1="1.5" y1="0" x2="1.5" y2="5"/>
-    </pattern>
     <pattern id="pattern-customer" patternUnits="userSpaceOnUse" width="5" height="5">
       <circle class="pat-customer" cx="2.5" cy="2.5" r="1.6"/>
-    </pattern>
-    <pattern id="pattern-human" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
-      <line class="pat-human" x1="1.25" y1="0" x2="1.25" y2="5"/>
-      <line class="pat-human" x1="0" y1="1.25" x2="5" y2="1.25"/>
     </pattern>
   </defs>
 </svg>
@@ -339,7 +321,7 @@
         <p>Designed to decide, once built:</p>
         <ul>
           <li>Scout: who is worth a sample</li>
-          <li>Validator: pass or reject a script</li>
+          <li>Validator: pass or reject a script (built, no live stage yet)</li>
           <li>Art Director: which scenes to use</li>
           <li>Quality Check: pass or send back</li>
         </ul>
@@ -363,7 +345,7 @@
     <div>
       <h3>Autonomy: who is designed to do the work</h3>
       <ul id="key-autonomy"></ul>
-      <p class="key-note">Counts cover the eleven stages in Diagram 2. No stripe means no level: accounts, infrastructure, undecided parts and outputs have none.</p>
+      <p class="key-note">Counts cover the eleven stages in Diagram 2. Get paid has no level until an owner is chosen. No stripe means no level: accounts, infrastructure, undecided parts and outputs have none.</p>
     </div>
   </section>
 
@@ -373,7 +355,7 @@
       <p class="lead">The design: a customer URL or a Scout lead goes through ten steps and comes out as finished video files.</p>
       <div class="diagram-scroll">
         <svg class="diagram" id="technical-svg" viewBox="0 0 1264 1560" role="img"
-             aria-label="Both ways in feed one ten-step pipeline. Dashed heavy arrows are the two feedback loops: Validator issues go back to the Director, and review failures go back to the Director or the Art Director. Whether an exported edit passes the Validator first is still open.">
+             aria-label="Both ways in feed one ten-step pipeline, built around the campaign.json contract. Dashed heavy arrows are the two feedback loops: Validator issues go back to the Director, and review failures go back to the Director or the Art Director. Whether an exported edit passes the Validator first is still open.">
 
           <!-- Lane labels -->
           <text class="lane" x="24" y="20">CONTROL LAYER</text>
@@ -398,6 +380,7 @@
           <path class="flow" d="M616 1382 V1417"/>
 
           <!-- Side inputs and outputs -->
+          <path class="flow" d="M304 470 H395"/>
           <path class="flow" d="M304 718 H395"/>
           <path class="flow" d="M304 966 H395"/>
           <path class="flow" d="M304 1090 H395"/>
@@ -429,6 +412,7 @@
           <text class="edge-label" x="628" y="1156">rendered video</text>
           <text class="edge-label" x="628" y="1280">passes review, with the review report</text>
           <text class="edge-label" x="628" y="1404">delivers up to 18 exports</text>
+          <text class="edge-label" x="350" y="462" text-anchor="middle">schema</text>
           <text class="edge-label" x="350" y="710" text-anchor="middle">new assets</text>
           <text class="edge-label" x="350" y="958" text-anchor="middle">audio, timing</text>
           <text class="edge-label" x="350" y="1072" text-anchor="middle">export only</text>
@@ -485,8 +469,9 @@
           <g data-node="researcher" data-chips="top" data-show-autonomy transform="translate(396 178)">
             <rect class="card" width="440" height="88" rx="8"/>
             <text class="name" x="46" y="25"></text>
-            <text class="detail" x="22" y="47">Playwright captures real screenshots, colours, fonts, logo.</text>
-            <text class="detail" x="22" y="65">Extracts claims quoted word for word, with source URL.</text>
+            <text class="detail" x="22" y="45">Playwright captures real screenshots, colours, fonts, logo.</text>
+            <text class="detail" x="22" y="62">Extracts claims quoted word for word, with source URL.</text>
+            <text class="detail" x="22" y="79">The first agent on the Naive SDK.</text>
           </g>
           <g data-node="director" data-chips="top" data-show-autonomy transform="translate(396 302)">
             <rect class="card" width="440" height="88" rx="8"/>
@@ -499,13 +484,14 @@
             <text class="name" x="46" y="25"></text>
             <text class="detail" x="22" y="45">Pre-render gate. Rejects invented numbers, missing assets,</text>
             <text class="detail" x="22" y="62">bad timing, long text and low contrast.</text>
-            <text class="detail" x="22" y="79">PR 1 open in boiler-room.</text>
+            <text class="detail" x="22" y="79">Merged to dev, 522 tests passing.</text>
           </g>
           <g data-node="script-approval" data-chips="top" data-show-autonomy transform="translate(396 550)">
             <rect class="card" width="440" height="88" rx="8"/>
             <text class="name" x="46" y="25"></text>
-            <text class="detail" x="22" y="47">Human step: the customer or the founder approves the script.</text>
-            <text class="detail" x="22" y="65">An approval pause holds the run here.</text>
+            <text class="detail" x="22" y="45">Customer step: the customer approves their own video's script.</text>
+            <text class="detail" x="22" y="62">An approval pause holds the run here.</text>
+            <text class="detail" x="22" y="79">Sample videos skip this step: agents decide.</text>
           </g>
           <g data-node="art-director" data-chips="top" data-show-autonomy transform="translate(396 674)">
             <rect class="card" width="440" height="88" rx="8"/>
@@ -516,9 +502,8 @@
           <g data-node="motion-library" data-chips="top" transform="translate(396 798)">
             <rect class="card" width="440" height="88" rx="8"/>
             <text class="name" x="46" y="25"></text>
-            <text class="detail" x="22" y="45"><tspan class="mono">packages/motion</tspan>: Remotion scenes, transitions, motion tokens.</text>
-            <text class="detail" x="22" y="62">Based on the Latchkey motion system and open source</text>
-            <text class="detail" x="22" y="79">libraries, both still being assessed.</text>
+            <text class="detail" x="22" y="47"><tspan class="mono">packages/motion</tspan>: Remotion scenes, transitions, motion tokens.</text>
+            <text class="detail" x="22" y="65">Written new on Remotion and open source libraries.</text>
           </g>
           <g data-node="audio" data-chips="top" transform="translate(396 922)">
             <rect class="card" width="440" height="88" rx="8"/>
@@ -529,7 +514,7 @@
           <g data-node="render-service" data-chips="top" transform="translate(396 1046)">
             <rect class="card" width="440" height="88" rx="8"/>
             <text class="name" x="46" y="25"></text>
-            <text class="detail" x="22" y="47">Remotion and FFmpeg.</text>
+            <text class="detail" x="22" y="47"><tspan class="mono">services/render</tspan>: Remotion and FFmpeg.</text>
             <text class="detail" x="22" y="65">Rendering happens only on export.</text>
           </g>
           <g data-node="quality-check" data-chips="top" data-show-autonomy transform="translate(396 1170)">
@@ -552,11 +537,17 @@
             <text class="name" x="22" y="25"></text>
             <text class="detail" x="22" y="46">Image, video and 3D generation.</text>
           </g>
+          <g data-node="campaign-contract" data-chips="bottom" transform="translate(24 418)">
+            <rect class="card" width="280" height="104" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46"><tspan class="mono">packages/schema</tspan>: the format the</text>
+            <text class="detail" x="22" y="63">Director writes and the Validator checks.</text>
+          </g>
           <g data-node="elevenlabs" data-chips="bottom" transform="translate(24 903)">
             <rect class="card" width="280" height="126" rx="8"/>
             <text class="name" x="22" y="25"></text>
-            <text class="detail" x="22" y="46"><tspan data-rail="elevenlabs-reserve"></tspan>, reserved for the</text>
-            <text class="detail" x="22" y="63">reference and demo videos only.</text>
+            <text class="detail" x="22" y="46">Reserved for the videos that matter:</text>
+            <text class="detail" x="22" y="63">the reference and demo videos only.</text>
             <text class="detail" x="22" y="80">No backup provider.</text>
           </g>
           <g data-node="data-store" data-chips="bottom" transform="translate(928 794)">
@@ -564,16 +555,11 @@
             <text class="name" x="22" y="25"></text>
             <text class="detail" x="22" y="46">Nothing chosen yet, so not wired in.</text>
           </g>
-          <g data-node="render-host" data-chips="bottom" transform="translate(928 1024)">
-            <rect class="card" width="280" height="132" rx="8"/>
+          <g data-node="render-host" data-chips="bottom" transform="translate(928 1038)">
+            <rect class="card" width="280" height="104" rx="8"/>
             <text class="name" x="22" y="25"></text>
-            <rect class="cell" x="22" y="34" width="112" height="24" rx="5"/>
-            <text class="cell-text" x="78" y="51" style="font-size:11.5px">Naive computer</text>
-            <text class="detail" x="141" y="51">or</text>
-            <rect class="cell" x="158" y="34" width="112" height="24" rx="5"/>
-            <text class="cell-text" x="214" y="51" style="font-size:11.5px">Latchkey runners</text>
-            <text class="detail" x="22" y="75">Both proven able to render.</text>
-            <text class="detail" x="22" y="92">Speed test still being finished.</text>
+            <text class="detail" x="22" y="46">Naive computers. One video is split</text>
+            <text class="detail" x="22" y="63">across several computers.</text>
           </g>
 
           <!-- Editing -->
@@ -637,24 +623,43 @@
         <span><svg width="56" height="12" aria-hidden="true"><path class="flow" d="M2 6 H54"/></svg> Forward flow, labelled with what moves</span>
         <span><svg width="56" height="12" aria-hidden="true"><path class="loop" d="M2 6 H54"/></svg> Feedback loop, sends work back</span>
       </div>
-      <figcaption>Both ways in feed one ten-step pipeline. Validator issues go back to the Director before anything is approved. Review failures go back to the Director or the Art Director before anything is delivered. Dashboard edits change <code>campaign.json</code> and preview in the browser; rendering waits for export. Whether an export passes the Validator first is still open.</figcaption>
+      <figcaption>Both ways in feed one ten-step pipeline. Validator issues go back to the Director before anything is approved. A customer approves the script of their own video; for a sample video, agents decide. Review failures go back to the Director or the Art Director before anything is delivered. Dashboard edits change <code>campaign.json</code> and preview in the browser; rendering waits for export. Whether an export passes the Validator first is still open.</figcaption>
     </figure>
   </section>
 
   <section data-show="company" data-detail aria-labelledby="company-heading">
     <figure>
       <h2 id="company-heading">Diagram 2: how the company runs itself</h2>
-      <p class="lead">The design: eleven stages form a closed loop. Each tab marks a stage where a person acts: the founder, another person or a customer.</p>
+      <p class="lead">The design: eleven stages form a closed loop, run by agents except where a tab marks a customer step. The company layer in the middle comes after the product is nailed down.</p>
       <div class="diagram-scroll">
         <svg class="diagram" id="company-svg" viewBox="0 0 1424 848" role="img"
-             aria-label="Eleven company stages form a closed loop around the human boundary. Five tabs mark where a person acts: the founder at send outreach and handle replies, a customer at customer intake and at the script approval inside produce the video, and a person at get paid. The founder's three steps are inside the boundary and stay human.">
+             aria-label="Eleven company stages form a closed loop. Agents run nine of them in the design target. Two tabs cross the customer boundary: a customer submits a URL at customer intake and approves the script inside produce the video. Get paid has no owner chosen. In the middle, the company layer shows three planned peer functions, CEO, development and GTM, side by side rather than as a hierarchy.">
 
-          <!-- The loop track and the human boundary it runs around -->
+          <!-- The loop track -->
           <rect class="track" x="140" y="88" width="1144" height="672" rx="90"/>
-          <rect class="zone" x="276" y="172" width="872" height="504" rx="14"/>
 
-          <text class="zone-title" x="300" y="206">HUMAN BOUNDARY</text>
-          <text class="zone-note" x="300" y="228">Inside this line the founder decides. Each tab marks a stage where a person acts; the stage's own label shows who does the rest.</text>
+          <!-- The company layer: planned end state. Three peers side by side, never a hierarchy,
+               because Naive limits delegation to one level. -->
+          <rect class="band" x="276" y="172" width="872" height="252" rx="12"/>
+          <text class="band-title" x="300" y="200">COMPANY LAYER</text>
+          <text class="zone-note" x="300" y="222">The end state: agents run the company itself, from CEO decisions to development and GTM.</text>
+          <text class="zone-note" x="300" y="240">Side by side, not a hierarchy: Naive limits delegation to one level, so a CEO cannot sit over a sub-team that delegates again.</text>
+
+          <!-- What the agents do with no one approving -->
+          <rect class="band" x="276" y="440" width="366" height="236" rx="12"/>
+          <text class="band-title" x="300" y="468">NO APPROVAL STEPS</text>
+          <text class="zone-note" x="300" y="492">The founder approves nothing.</text>
+          <text class="zone-note" x="300" y="514">Agents push to any branch, deploy and send</text>
+          <text class="zone-note" x="300" y="532">email on their own. Nobody approves outbound</text>
+          <text class="zone-note" x="300" y="550">email.</text>
+          <text class="zone-note" x="300" y="572">Sample videos get no human script approval:</text>
+          <text class="zone-note" x="300" y="590">agents decide.</text>
+
+          <!-- The customer boundary: where a customer acts. The tabs cross it from their stages. -->
+          <rect class="zone" x="658" y="440" width="490" height="236" rx="14"/>
+          <text class="zone-title" x="682" y="468">CUSTOMER BOUNDARY</text>
+          <text class="zone-note" x="682" y="492">The only human in normal operation is the customer.</text>
+          <text class="zone-note" x="682" y="510">Each tab marks a stage where a customer acts.</text>
 
           <!-- Stage to stage -->
           <path class="ring" d="M538 88 H599"/>
@@ -669,14 +674,11 @@
           <path class="ring" d="M140 524 V325"/>
           <path class="ring" d="M140 188 V178 a90 90 0 0 1 90 -90 H313"/>
 
-          <!-- Daily report into the human zone -->
-          <path class="flow" d="M252 270 H328"/>
-
           <text class="edge-label" x="569" y="80" text-anchor="middle">leads</text>
           <text class="edge-label" x="855" y="64" text-anchor="middle">worth a</text>
           <text class="edge-label" x="855" y="80" text-anchor="middle">sample</text>
           <text class="edge-label" x="1128" y="64">sample and</text>
-          <text class="edge-label" x="1128" y="80">draft email</text>
+          <text class="edge-label" x="1128" y="80">email</text>
           <text class="edge-label" x="1296" y="344">sent email</text>
           <text class="edge-label" x="1296" y="512">wants a video</text>
           <text class="edge-label" x="1252" y="782" text-anchor="end">URL</text>
@@ -686,44 +688,37 @@
           <text class="edge-label" x="176" y="782">results</text>
           <text class="edge-label" x="152" y="428">adjustments</text>
           <text class="edge-label" x="176" y="74">next cycle</text>
-          <text class="edge-label" x="284" y="260">daily report</text>
 
-          <text class="zone-founder" x="336" y="275">Founder: these three steps stay human</text>
-
-          <!-- The founder's steps -->
-          <g data-node="approve-email" data-chips="top" data-show-autonomy transform="translate(300 290)">
-            <rect class="card" width="692" height="158" rx="8"/>
+          <!-- Company layer functions -->
+          <g data-node="ceo-agent" data-chips="bottom" data-show-autonomy transform="translate(292 254)">
+            <rect class="card" width="272" height="154" rx="8"/>
             <text class="name" x="22" y="27"></text>
-            <text class="detail" x="22" y="51">Approves outbound email before it goes out.</text>
-            <text class="open-note" data-question="delivery-email" x="22" y="75">Still open: does the stage 8 delivery email need this too?</text>
+            <text class="detail" x="22" y="50">Sets priorities, allocates budget,</text>
+            <text class="detail" x="22" y="67">reviews results, writes the</text>
+            <text class="detail" x="22" y="84">operating report.</text>
+            <text class="when" x="22" y="111"></text>
           </g>
-          <g data-node="approve-spend" data-chips="top" data-show-autonomy transform="translate(300 462)">
-            <rect class="card" width="580" height="70" rx="8"/>
+          <g data-node="development-agents" data-chips="bottom" data-show-autonomy transform="translate(576 254)">
+            <rect class="card" width="272" height="154" rx="8"/>
             <text class="name" x="22" y="27"></text>
-            <text class="detail" x="22" y="51">Applies at any stage. Caps are in the guard rails below.</text>
+            <text class="detail" x="22" y="50">Improve the product, add scenes to</text>
+            <text class="detail" x="22" y="67">the library, fix failures and ship</text>
+            <text class="detail" x="22" y="84">their own code.</text>
+            <text class="when" x="22" y="111"></text>
           </g>
-          <g data-node="approve-production" data-chips="top" data-show-autonomy transform="translate(300 544)">
-            <rect class="card" width="580" height="70" rx="8"/>
+          <g data-node="gtm-agents" data-chips="bottom" data-show-autonomy transform="translate(860 254)">
+            <rect class="card" width="272" height="154" rx="8"/>
             <text class="name" x="22" y="27"></text>
-            <text class="detail" x="22" y="51">Applies at any stage, and to any production deploy.</text>
+            <text class="detail" x="22" y="50">Scout, outreach, marketing.</text>
+            <text class="detail" x="22" y="67">Stages 1 to 5 belong to this function.</text>
+            <text class="when" x="22" y="111"></text>
           </g>
 
           <!-- Tabs: drawn before the cards so each one comes out from under its stage -->
-          <g class="tab" data-tab-for="send-outreach" transform="translate(1018 272)">
-            <path class="tab-link" d="M0 24 H-26"/>
-            <rect class="tab-box" width="164" height="48" rx="7"/>
-          </g>
-          <g class="tab" data-tab-for="handle-replies" transform="translate(1018 400)">
-            <path class="tab-link" d="M0 24 H-26"/>
-            <rect class="tab-box" width="164" height="48" rx="7"/>
-          </g>
           <g class="tab" data-tab-for="customer-intake" transform="translate(1018 568)">
             <rect class="tab-box" width="164" height="48" rx="7"/>
           </g>
           <g class="tab" data-tab-for="produce-video" transform="translate(910 632)">
-            <rect class="tab-box" width="176" height="70" rx="7"/>
-          </g>
-          <g class="tab" data-tab-for="get-paid" transform="translate(338 632)">
             <rect class="tab-box" width="176" height="70" rx="7"/>
           </g>
 
@@ -748,20 +743,21 @@
             <text class="owner" x="22" y="46"></text>
             <text class="detail" x="22" y="65">Goes only to that company.</text>
             <text class="detail" x="22" y="82">Never posted publicly.</text>
-            <text class="open-note" data-question="sample-script" x="22" y="99">Script approval: still open.</text>
+            <text class="detail" x="22" y="99">Agents decide the script.</text>
           </g>
           <g data-node="send-outreach" data-chips="bottom" data-show-autonomy transform="translate(1172 188)">
             <rect class="card" width="224" height="136" rx="8"/>
             <text class="name" x="46" y="25"></text>
             <text class="owner" x="22" y="46"></text>
             <text class="detail" x="22" y="65">Sends through AgentMail.</text>
+            <text class="detail" x="22" y="82">Nobody approves the email.</text>
           </g>
           <g data-node="handle-replies" data-chips="bottom" data-show-autonomy transform="translate(1172 356)">
             <rect class="card" width="224" height="136" rx="8"/>
             <text class="name" x="46" y="25"></text>
             <text class="owner" x="22" y="46"></text>
             <text class="detail" x="22" y="65">Reads replies by webhook</text>
-            <text class="detail" x="22" y="82">and drafts answers.</text>
+            <text class="detail" x="22" y="82">and answers them.</text>
           </g>
           <g data-node="customer-intake" data-chips="bottom" data-show-autonomy transform="translate(1172 524)">
             <rect class="card" width="224" height="136" rx="8"/>
@@ -782,13 +778,12 @@
             <text class="owner" x="22" y="46"></text>
             <text class="detail" x="22" y="65">File link and email.</text>
             <text class="detail" x="22" y="82">Handles revisions.</text>
-            <text class="open-note" data-question="delivery-email" x="22" y="99">Email approval: still open.</text>
           </g>
-          <g data-node="get-paid" data-chips="bottom" data-show-autonomy transform="translate(314 692)">
+          <g data-node="get-paid" data-chips="bottom" transform="translate(314 692)">
             <rect class="card" width="224" height="136" rx="8"/>
             <text class="name" x="46" y="25"></text>
             <text class="owner" x="22" y="46"></text>
-            <text class="detail" x="22" y="65">Nothing chosen yet.</text>
+            <text class="detail" x="22" y="65">Still to be decided.</text>
           </g>
           <g data-node="learn" data-chips="bottom" data-show-autonomy transform="translate(28 524)">
             <rect class="card" width="224" height="136" rx="8"/>
@@ -807,7 +802,7 @@
           </g>
         </svg>
       </div>
-      <figcaption>The tabs show who acts and where. Samples use another company's brand, so they go only to that company and are never posted publicly. Stage 7 counts as agent-run, with one customer script approval inside it.</figcaption>
+      <figcaption>The tabs show where a customer acts. Samples use another company's brand, so they go only to that company and are never posted publicly. Stage 7 counts as agent-run, with one customer script approval inside it. Stage 9 has no owner chosen, so it counts as neither.</figcaption>
     </figure>
   </section>
 
@@ -820,7 +815,7 @@
 <script>
 /* Update the map here. Change a word, reload, and the diagrams and counts follow.
    status:   live | building | planned | decide
-   autonomy: agent | approval | customer | human, or null where no level applies
+   autonomy: agent | customer, or null where no level applies
              (accounts, infrastructure, undecided parts and outputs). null draws no stripe.
    Only mark something live once it is working and verified. */
 const MAP = {
@@ -829,16 +824,14 @@ const MAP = {
   /* Real results only. All zero until something has actually happened. */
   counters: { videosDelivered: 0, leadsFound: 0, emailsSent: 0, replies: 0 },
 
-  /* What comes next, as ids from the lists below, in order. The founder sets this. */
+  /* What comes next, as ids from the lists below, in order. */
   next: [],
 
-  /* Questions only the founder can answer. Each shows under Needs you, and on the map
-     wherever it applies. stage says which company stage it could change. Delete one once
-     it is answered, then change the stage or the drawing to match the answer. */
+  /* Open questions. Each shows under Needs you, and on the map wherever it applies. stage
+     says which company stage it could change. Delete one once it is answered, then change
+     the stage or the drawing to match the answer. */
   questions: [
     { id: 'export-recheck', text: 'Do exported edits go back through the Validator?' },
-    { id: 'sample-script',  text: "Who approves a sample's script, if anyone?", stage: 3 },
-    { id: 'delivery-email', text: 'Does the delivery email need your approval?', stage: 8 },
   ],
 
   /* Diagram 1, how Boiler Room works. step is the pipeline order. */
@@ -847,19 +840,20 @@ const MAP = {
     { id: 'naive-team',       name: 'Naive agent team',        status: 'planned',  autonomy: 'agent' },
     { id: 'dashboard',        name: 'Customer dashboard',      status: 'planned',  autonomy: 'customer' },
     { id: 'scout',            name: 'Scout agent',             status: 'planned',  autonomy: 'agent' },
-    { id: 'researcher',       name: 'Researcher agent',        status: 'planned',  autonomy: 'agent',    step: 1 },
+    { id: 'researcher',       name: 'Researcher agent',        status: 'building', autonomy: 'agent',    step: 1 },
     { id: 'director',         name: 'Director agent',          status: 'planned',  autonomy: 'agent',    step: 2 },
-    { id: 'validator',        name: 'Validator',               status: 'building', autonomy: null,       step: 3 },
-    { id: 'script-approval',  name: 'Script approval',         status: 'planned',  autonomy: 'approval', step: 4 },
+    { id: 'validator',        name: 'Validator',               status: 'live',     autonomy: null,       step: 3 },
+    { id: 'script-approval',  name: 'Script approval',         status: 'planned',  autonomy: 'customer', step: 4 },
     { id: 'art-director',     name: 'Art Director agent',      status: 'planned',  autonomy: 'agent',    step: 5 },
     { id: 'motion-library',   name: 'Motion library',          status: 'building', autonomy: null,       step: 6 },
     { id: 'audio',            name: 'Audio',                   status: 'planned',  autonomy: null,       step: 7 },
-    { id: 'render-service',   name: 'Render service',          status: 'planned',  autonomy: null,       step: 8 },
+    { id: 'render-service',   name: 'Render service',          status: 'building', autonomy: null,       step: 8 },
     { id: 'quality-check',    name: 'Quality Check agent',     status: 'planned',  autonomy: 'agent',    step: 9 },
     { id: 'account-manager',  name: 'Account Manager agent',   status: 'planned',  autonomy: 'agent',    step: 10 },
     { id: 'naive-generation', name: 'Naive generation',        status: 'planned',  autonomy: null },
+    { id: 'campaign-contract', name: 'campaign.json contract', status: 'live',     autonomy: null },
     { id: 'elevenlabs',       name: 'ElevenLabs account',      status: 'live',     autonomy: null },
-    { id: 'render-host',      name: 'Render host',             status: 'decide',   autonomy: null },
+    { id: 'render-host',      name: 'Render host',             status: 'building', autonomy: null },
     { id: 'data-store',       name: 'Data store',              status: 'decide',   autonomy: null },
     { id: 'dashboard-editor', name: 'Dashboard editor',        status: 'planned',  autonomy: 'customer' },
     { id: 'browser-player',   name: 'Remotion browser player', status: 'planned',  autonomy: 'customer' },
@@ -868,35 +862,39 @@ const MAP = {
     { id: 'exports',          name: 'Exports',                 status: 'planned',  autonomy: null },
   ],
 
-  /* Diagram 2, how the company runs itself. stage is the loop order; the three
-     entries without a stage are the founder's steps inside the human boundary.
-     person is the tab text where a person acts, and who says which kind of person:
-     founder | customer | person. Leave person out and the tab goes. */
+  /* Diagram 2, how the company runs itself. stage is the loop order. customerStep is the tab
+     text where a customer acts: leave it out and the tab goes. A stage with no owner chosen
+     stays at status decide with autonomy null, and counts as neither agent nor customer. */
   company: [
     { id: 'find-leads',      stage: 1,  name: 'Find leads',          owner: 'Scout',           status: 'planned', autonomy: 'agent' },
     { id: 'qualify',         stage: 2,  name: 'Qualify',             owner: 'Scout',           status: 'planned', autonomy: 'agent' },
     { id: 'sample-video',    stage: 3,  name: 'Make a sample video', owner: 'Production crew', status: 'planned', autonomy: 'agent' },
-    { id: 'send-outreach',   stage: 4,  name: 'Send outreach',       owner: 'Account Manager', status: 'planned', autonomy: 'approval', person: 'Founder approves every email', who: 'founder' },
-    { id: 'handle-replies',  stage: 5,  name: 'Handle replies',      owner: 'Account Manager', status: 'planned', autonomy: 'approval', person: 'Founder approves every answer', who: 'founder' },
-    { id: 'customer-intake', stage: 6,  name: 'Customer intake',     owner: 'Customer',        status: 'planned', autonomy: 'customer', person: 'Customer submits a URL', who: 'customer' },
-    { id: 'produce-video',   stage: 7,  name: 'Produce the video',   owner: 'Full pipeline',   status: 'planned', autonomy: 'agent',    person: 'Customer approves the script', who: 'customer' },
+    { id: 'send-outreach',   stage: 4,  name: 'Send outreach',       owner: 'Account Manager', status: 'planned', autonomy: 'agent' },
+    { id: 'handle-replies',  stage: 5,  name: 'Handle replies',      owner: 'Account Manager', status: 'planned', autonomy: 'agent' },
+    { id: 'customer-intake', stage: 6,  name: 'Customer intake',     owner: 'Customer',        status: 'planned', autonomy: 'customer', customerStep: 'Customer submits a URL' },
+    { id: 'produce-video',   stage: 7,  name: 'Produce the video',   owner: 'Full pipeline',   status: 'planned', autonomy: 'agent',    customerStep: 'Customer approves the script' },
     { id: 'deliver-revise',  stage: 8,  name: 'Deliver and revise',  owner: 'Account Manager', status: 'planned', autonomy: 'agent' },
-    { id: 'get-paid',        stage: 9,  name: 'Get paid',            owner: 'A person',        status: 'decide',  autonomy: 'human',    person: 'A person does this', who: 'person' },
+    { id: 'get-paid',        stage: 9,  name: 'Get paid',            owner: 'Not chosen yet',  status: 'decide',  autonomy: null },
     { id: 'learn',           stage: 10, name: 'Learn',               owner: 'Not assigned yet', status: 'planned', autonomy: 'agent' },
-    { id: 'report',          stage: 11, name: 'Report',              owner: 'Coordinator',     status: 'planned', autonomy: 'agent' },
-    { id: 'approve-email',      name: 'Approve outbound email',                   status: 'planned', autonomy: 'human' },
-    { id: 'approve-spend',      name: 'Decide spending above caps',               status: 'planned', autonomy: 'human' },
-    { id: 'approve-production', name: 'Promote to main and deploy to production', status: 'planned', autonomy: 'human' },
+    { id: 'report',          stage: 11, name: 'Report',              owner: 'CEO agent',       status: 'planned', autonomy: 'agent' },
   ],
 
-  /* Guard rails. status null means a limit or a balance, not something being built. */
+  /* The company layer, the planned end state in the middle of Diagram 2. These are peers, not a
+     hierarchy: Naive limits delegation to one level. They are not stages, so no count includes them. */
+  companyLayer: [
+    { id: 'ceo-agent',          name: 'CEO agent',          status: 'planned', autonomy: 'agent', when: 'After the product is nailed down' },
+    { id: 'development-agents', name: 'Development agents', status: 'planned', autonomy: 'agent', when: 'After the product is nailed down' },
+    { id: 'gtm-agents',         name: 'GTM agents',         status: 'planned', autonomy: 'agent', when: 'After the product is nailed down' },
+  ],
+
+  /* Guard rails. status null means a limit, not something being built. This repo is public:
+     no account balances or credit counts here. */
   guardRails: [
     { id: 'agent-budgets',      name: 'Naive agent budgets',     value: '',                                detail: 'Budgets on each agent.', status: 'planned' },
     { id: 'media-cap',          name: 'Per-run media spend cap', value: '',                                detail: 'Separate cap, because agent budgets do not cap media jobs.', status: 'planned' },
-    { id: 'claims-gate',        name: 'Claims gate',             value: '',                                detail: 'The Validator rejects invented numbers before script approval. Whether exported edits pass it too is still open.', status: 'building' },
+    { id: 'claims-gate',        name: 'Claims gate',             value: '',                                detail: 'The Validator rejects invented numbers before script approval. Whether exported edits pass it too is still open.', status: 'live' },
     { id: 'audit-logs',         name: 'Naive audit logs',        value: '',                                detail: 'A record of what the agents did.', status: 'planned' },
-    { id: 'elevenlabs-reserve', name: 'ElevenLabs reserve',      value: '3,531 credits',                   detail: 'Reserved for the videos that matter: the reference and demo videos only. No backup provider.', status: 'planned' },
-    { id: 'naive-balance',      name: 'Naive balance',           value: '250.91 USD',                      detail: 'As of 2026-11-07.', status: null },
+    { id: 'elevenlabs-reserve', name: 'ElevenLabs reserve',      value: '',                                detail: 'Reserved for the videos that matter: the reference and demo videos only. No backup provider.', status: 'planned' },
     { id: 'agentmail-plan',     name: 'AgentMail free plan',     value: '3,000 emails a month, 3 inboxes', detail: 'Plan limit.', status: null },
   ],
 };
@@ -909,14 +907,11 @@ const STATUS = {
 };
 const AUTONOMY = {
   agent: 'runs with no human',
-  approval: 'agent does the work, a human approves',
   customer: 'the customer acts',
-  human: 'a person does it',
 };
-const WHO = new Set(['founder', 'customer', 'person']);
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const everyNode = [...MAP.technical, ...MAP.company];
+const everyNode = [...MAP.technical, ...MAP.company, ...MAP.companyLayer];
 const nodeById = new Map(everyNode.map(item => [item.id, item]));
 const stages = MAP.company.filter(item => item.stage);
 
@@ -936,18 +931,11 @@ const GLYPHS = {
   planned: g => svgEl('circle', { class: 'glyph-line', r: 3.5 }, g),
   decide: g => svgEl('path', { class: 'glyph-fill', d: 'M0 -4.5 L4.5 0 L0 4.5 L-4.5 0 z' }, g),
   agent: g => svgEl('rect', { class: 'glyph-fill', x: -3, y: -3, width: 6, height: 6 }, g),
-  approval: g => svgEl('path', { class: 'glyph-line', d: 'M-3.5 0.2 L-1 2.8 L3.8 -3' }, g),
   customer: g => {
     svgEl('circle', { class: 'glyph-line', cy: -2.3, r: 2 }, g);
     svgEl('path', { class: 'glyph-line', d: 'M-3.8 4.5 C-3.8 0.5 3.8 0.5 3.8 4.5' }, g);
   },
-  human: g => drawPerson(g),
 };
-
-function drawPerson(g) {
-  svgEl('circle', { class: 'glyph-fill', cy: -2.6, r: 2.4 }, g);
-  svgEl('path', { class: 'glyph-fill', d: 'M-4.2 5 C-4.2 -0.2 4.2 -0.2 4.2 5 z' }, g);
-}
 
 /* Draws a label chip. It always carries a word and a shape, never colour alone. */
 function drawChip(parent, x, y, value, alignRight, quiet) {
@@ -987,6 +975,8 @@ function decorateNode(node, item) {
   node.querySelector('.name').textContent = item.name;
   const owner = node.querySelector('.owner');
   if (owner) owner.textContent = `Owner: ${item.owner}`;
+  const when = node.querySelector('.when');
+  if (when) when.textContent = item.when;
 
   const number = item.step ?? item.stage;
   if (number) {
@@ -1022,16 +1012,13 @@ function twoLines(text) {
 
 function drawTab(tab) {
   const item = nodeById.get(tab.dataset.tabFor);
-  if (!item || !item.person) { tab.style.display = 'none'; return; }
-  tab.dataset.who = item.who;
-  const person = svgEl('g', { transform: 'translate(18 24)' }, tab);
-  if (item.who === 'customer') GLYPHS.customer(person);
-  else drawPerson(person);
-  twoLines(item.person).forEach((line, index) => {
+  if (!item || !item.customerStep) { tab.style.display = 'none'; return; }
+  GLYPHS.customer(svgEl('g', { transform: 'translate(18 24)' }, tab));
+  twoLines(item.customerStep).forEach((line, index) => {
     const text = svgEl('text', { class: 'tab-text', x: 32, y: 21 + index * 15 }, tab);
     text.textContent = line;
   });
-  svgEl('title', {}, tab).textContent = item.person;
+  svgEl('title', {}, tab).textContent = item.customerStep;
 }
 
 /* Marks on the map that belong to an open question go when the question does. */
@@ -1057,7 +1044,7 @@ function fillList(id, lines, whenEmpty) {
 }
 
 function renderRightNow() {
-  const named = status => everyNode.filter(item => item.status === status).map(item => item.name);
+  const named = status => [...everyNode, ...MAP.guardRails].filter(item => item.status === status).map(item => item.name);
   standaloneChip(document.getElementById('now-head-live'), 'live');
   standaloneChip(document.getElementById('now-head-building'), 'building');
   standaloneChip(document.getElementById('now-head-needs'), 'decide');
@@ -1095,10 +1082,11 @@ function renderScoreboard() {
   const agentRun = stages.filter(stage => stage.autonomy === 'agent').length;
   const liveToday = stages.filter(stage => stage.status === 'live').length;
   const openStages = MAP.questions.filter(question => question.stage).map(question => question.stage);
+  const stageList = numbers => `${numbers.length === 1 ? 'stage' : 'stages'} ${numbers.join(', ')}`;
   setText('tally-live', `Stages live today: ${liveToday} of ${total}`);
-  setText('tally-agent', `Agent-run stages: ${agentRun} of ${total}`);
-  setText('tally-agent-note', 'Design target, not what runs today.'
-    + (openStages.length ? ` Open questions on stages ${openStages.join(', ')} could lower it.` : ''));
+  setText('tally-agent', `Design target: ${agentRun} of ${total} agent-run`);
+  setText('tally-agent-note', 'Stages agents are designed to run. Not what runs today.'
+    + (openStages.length ? ` Open questions on ${stageList(openStages)} could lower it.` : ''));
 
   setText('count-videos', MAP.counters.videosDelivered);
   setText('count-leads', MAP.counters.leadsFound);
@@ -1108,19 +1096,16 @@ function renderScoreboard() {
   setText('decisions-today', liveToday === 0 ? `None yet: ${liveToday} of ${total} stages are live.` : `${liveToday} of ${total} stages are live.`);
 
   setText('stepins-today', liveToday === 0 ? 'No stage runs yet, so there are no step-ins to report.' : `${liveToday} of ${total} stages are live.`);
-  setText('stepins-design', 'By design:');
-  const stagesFor = who => {
-    const numbers = stages.filter(stage => stage.person && stage.who === who).map(stage => stage.stage);
-    if (!numbers.length) return '';
-    return `${numbers.length === 1 ? 'stage' : 'stages'} ${numbers.join(', ')}`;
-  };
+  setText('stepins-design', 'Design target:');
+  const customerStages = stages.filter(stage => stage.customerStep).map(stage => stage.stage);
+  const noOwner = stages.filter(stage => stage.autonomy === null).map(stage => stage.stage);
   fillList('stepins-list', [
-    `You: ${[stagesFor('founder'), 'any-stage spend and deploy'].filter(Boolean).join(', plus ')}`,
-    stagesFor('person') && `A person: ${stagesFor('person')}`,
-    stagesFor('customer') && `Customers: ${stagesFor('customer')}`,
+    'Founder: no steps',
+    customerStages.length && `Customers: ${stageList(customerStages)}`,
+    noOwner.length && `No owner chosen yet: ${stageList(noOwner)}`,
   ].filter(Boolean));
   if (openStages.length) {
-    setText('stepins-open', `Stages ${openStages.join(', ')} may add to this: see Needs you.`);
+    setText('stepins-open', `These may change on ${stageList(openStages)}: see Needs you.`);
     document.getElementById('stepins-open').hidden = false;
   }
 }
@@ -1169,7 +1154,7 @@ function checkMap() {
     const drawing = document.querySelector(`[data-node="${item.id}"]`);
     const showsLevel = drawing?.hasAttribute('data-show-autonomy');
     if (item.autonomy === null) {
-      if (item.stage || showsLevel) problems.push(`${item.id} needs an autonomy level`);
+      if ((item.stage && item.status !== 'decide') || showsLevel) problems.push(`${item.id} needs an autonomy level`);
     } else if (!(item.autonomy in AUTONOMY)) {
       problems.push(`${item.id} has an unknown autonomy: ${item.autonomy}`);
     } else if (drawing && !showsLevel) {
@@ -1183,10 +1168,9 @@ function checkMap() {
     if (!nodeById.has(tab.dataset.tabFor)) problems.push(`tab ${tab.dataset.tabFor} has no stage in the data`);
   }
   for (const stage of stages) {
-    if (stage.person && !document.querySelector(`[data-tab-for="${stage.id}"]`)) {
-      problems.push(`${stage.id} has a person step but no tab is drawn for it`);
+    if (stage.customerStep && !document.querySelector(`[data-tab-for="${stage.id}"]`)) {
+      problems.push(`${stage.id} has a customer step but no tab is drawn for it`);
     }
-    if (stage.person && !WHO.has(stage.who)) problems.push(`${stage.id} has an unknown who: ${stage.who}`);
   }
   for (const id of MAP.next) {
     if (!nodeById.has(id)) problems.push(`next lists ${id}, which is not in the data`);
@@ -1220,9 +1204,6 @@ document.querySelectorAll('[data-node]').forEach(node => {
 });
 document.querySelectorAll('[data-tab-for]').forEach(drawTab);
 drawQuestionMarks();
-document.querySelectorAll('[data-rail]').forEach(span => {
-  span.textContent = MAP.guardRails.find(rail => rail.id === span.dataset.rail)?.value ?? '';
-});
 renderRightNow();
 renderKey();
 renderScoreboard();

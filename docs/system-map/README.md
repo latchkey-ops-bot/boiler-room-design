@@ -2,16 +2,16 @@
 
 One page that shows how Boiler Room works and how much of the company runs without the founder. Open [`index.html`](index.html) by double-clicking it; it needs no server or install.
 
-The page holds what is live right now, both diagrams, the scoreboard, the human boundary and the guard rails. It answers the three questions the judges ask: what did the agents deliver, what decisions did they make, and where did you need to step in?
+The page holds what is live right now, both diagrams, the scoreboard, the customer boundary, the company layer and the guard rails. It answers the three questions the judges ask: what did the agents deliver, what decisions did they make, and where did you need to step in?
 
-Most of this is the design, not what runs today. The scoreboard keeps those two apart: "Stages live today" is the real number, "Agent-run stages" is the target.
+Most of this is the design, not what runs today. The scoreboard keeps those two apart: "Stages live today" is the real number, 0 of 11. "Design target" is what the design aims for, 9 of 11 agent-run.
 
 ## Right now
 
 As of 2026-11-07:
 
-- **Live:** Naive account, ElevenLabs account, AgentMail inbox
-- **Building:** Validator, Motion library
+- **Live:** Naive account, Validator, `campaign.json` contract, ElevenLabs account, AgentMail inbox, Claims gate
+- **Building:** Researcher agent, Motion library, Render service, Render host
 
 Click any image below to open it at full size. This first one stays readable at page width; the diagram images carry the same panels above the detail.
 
@@ -19,15 +19,19 @@ Click any image below to open it at full size. This first one stays readable at 
 
 ## Diagram 1: how Boiler Room works
 
-Both ways in feed one ten-step pipeline. The heavy dashed arrows are the two feedback loops. The DECIDE marker on the export arrow is an open question: whether an exported edit passes the Validator first.
+Both ways in feed one ten-step pipeline. The heavy dashed arrows are the two feedback loops. A customer approves the script of their own video; for a sample video, agents decide. The DECIDE marker on the export arrow is an open question: whether an exported edit passes the Validator first.
 
 ![Diagram 1: the ten-step pipeline, the systems it uses, and the two feedback loops](technical.png)
 
 ## Diagram 2: how the company runs itself
 
-Eleven stages form a closed loop around the human boundary. Each tab marks a stage where a person acts: the founder, another person or a customer. This image also carries the scoreboard and the guard rails.
+Eleven stages form a closed loop. The founder has given agents every permission and approves nothing, so the only human in normal operation is the customer. Each tab crosses the customer boundary at a stage where a customer acts: submitting a URL at stage 6 and approving the script of their own video at stage 7. Agents push to any branch, deploy and send email on their own. Stage 9, Get paid, has no owner chosen yet.
 
-![Diagram 2: the scoreboard, the eleven-stage company loop around the human boundary, and the guard rails](autonomy.png)
+The company layer in the middle is the end state, planned for after the product is nailed down: a CEO agent, development agents and GTM agents, with stages 1 to 5 belonging to GTM. It is drawn as three peers because Naive limits delegation to one level, so a CEO cannot sit over a sub-team that delegates again.
+
+This image also carries the scoreboard and the guard rails.
+
+![Diagram 2: the scoreboard, the eleven-stage company loop around the company layer and the customer boundary, and the guard rails](autonomy.png)
 
 ## Vocabulary
 
@@ -45,9 +49,7 @@ Stages, agents and customer steps also have an autonomy level, shown by a left s
 | Autonomy | Meaning | Stripe |
 | --- | --- | --- |
 | `agent` | Runs with no human | Solid |
-| `approval` | Agent does the work, a human approves | Hatched |
 | `customer` | The customer acts | Dotted |
-| `human` | A person does it | Crossed |
 
 Mark something `live` only once it is working and verified. A connected account is not a working step: the ElevenLabs account is live while the Audio step is still planned.
 
@@ -55,7 +57,7 @@ Mark something `live` only once it is working and verified. A connected account 
 
 Everything you need to change is in the `MAP` object at the top of the script in `index.html`.
 
-1. Change the word. For example, when the Validator is merged and verified, change its `status` from `'building'` to `'live'`.
+1. Change the word. For example, when the Render service is merged and verified, change its `status` from `'building'` to `'live'`.
 2. Update `lastUpdated`.
 3. Reload the page. Borders, chips, the Right now lists, the key and the scoreboard all follow from the data.
 4. Update the [Right now](#right-now) lists at the top of this README by hand.
@@ -65,14 +67,15 @@ Everything you need to change is in the `MAP` object at the top of the script in
 | --- | --- |
 | A status or autonomy level | That node's `status` or `autonomy` |
 | Real results (videos, leads, emails, replies) | `counters` |
-| Where a person acts | That stage's `person` and `who` (`founder`, `customer` or `person`). Leave `person` out and the tab disappears. |
+| Where a customer acts | That stage's `customerStep`. Leave it out and the tab disappears. |
+| A company layer function | `companyLayer`. Keep these as peers: Naive limits delegation to one level. |
 | What comes next | `next`: part ids in order. It reads "Not set yet" until you add some. |
 | An open question | `questions`. Delete one once it is answered and its marks go with it, then change the stage or the drawing to match the answer. |
-| The Naive balance, ElevenLabs credits or plan limits | `guardRails` |
+| Guard rails and plan limits | `guardRails`. This repo is public, so no account balances or credit counts, here or in the images. |
 
 Colours are CSS variables on `:root` at the top of the page, with a dark set below them. When the brand is chosen, swap those and nothing else.
 
-To add a node, draw a `<g data-node="your-id">` in the SVG and add an entry with the same `id` to the data. A node with an autonomy level needs `data-show-autonomy` on its drawing; a node with `autonomy: null` must not have it. If the data and the drawings stop matching, or a word is misspelled, the page shows a warning at the top and `render.mjs` refuses to run.
+To add a node, draw a `<g data-node="your-id">` in the SVG and add an entry with the same `id` to the data. A node with an autonomy level needs `data-show-autonomy` on its drawing; a node with `autonomy: null` must not have it. A stage can have `autonomy: null` only while its status is `decide`. If the data and the drawings stop matching, or a word is misspelled, the page shows a warning at the top and `render.mjs` refuses to run.
 
 ## Regenerate the images
 
