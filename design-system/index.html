@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boiler Room design system</title>
+<link rel="icon" href="logo/boiler-mark.svg">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<script src="icons/icons.js"></script>
+<style>
+  .top { padding: var(--br-space-7) 0 var(--br-space-8); }
+  .top .wrap { display: grid; gap: var(--br-space-5); }
+  .top .intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--br-space-6); align-items: end; }
+  .top .lede { font-size: 19px; max-width: 34em; }
+  .samples { display: flex; gap: var(--br-space-3); flex-wrap: wrap; }
+  .toc { display: flex; gap: var(--br-space-4); flex-wrap: wrap; }
+  .toc a { box-shadow: none; }
+
+  section { padding: var(--br-space-8) 0; }
+  section + section { border-top: 2px dashed var(--br-cream-deep); }
+  .head { display: grid; gap: var(--br-space-2); max-width: 680px; margin-bottom: var(--br-space-6); }
+  .grid { display: grid; gap: var(--br-space-5); }
+  .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .note { font-size: var(--br-text-sm); color: var(--br-muted); }
+  .row { display: flex; gap: var(--br-space-4); flex-wrap: wrap; align-items: center; }
+
+  /* Principles */
+  .principle { display: grid; gap: var(--br-space-2); align-content: start; }
+  .principle .icon { color: var(--br-steel); width: 24px; height: 24px; }
+
+  /* Logo */
+  .logo-tile { display: grid; place-items: center; min-height: 220px; padding: var(--br-space-6); }
+  .logo-tile.deep { background: var(--br-deep); --drop: var(--br-sky); }
+  .logo-tile.white { background: var(--br-white); }
+  .logo-tile.cream { background: var(--br-cream); --drop: var(--br-cream-deep); }
+  .sizes { display: flex; align-items: end; gap: var(--br-space-5); }
+  .sizes figure { margin: 0; display: grid; justify-items: center; gap: 6px; }
+  .dont { display: grid; gap: var(--br-space-2); }
+  .dont figure { margin: 0; display: grid; place-items: center; height: 120px; background: var(--br-white); position: relative; }
+  .dont figure::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top right, transparent calc(50% - 2px), var(--br-error-ink) calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px));
+    opacity: 0.7;
+  }
+
+  /* Colour */
+  .swatch-big { display: grid; gap: var(--br-space-3); padding: 0; overflow: hidden; }
+  .swatch-big .chip { height: 128px; }
+  .swatch-big .info { display: grid; gap: 4px; padding: 0 var(--br-space-4) var(--br-space-4); }
+  .swatch-big .info strong { font-family: var(--br-font-display); font-size: 21px; color: var(--br-deep); }
+  .swatch-sm { display: flex; gap: var(--br-space-3); align-items: center; }
+  .swatch-sm span:first-child {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+    box-shadow: 0 -2px 0 0 var(--br-ink), 0 2px 0 0 var(--br-ink), -2px 0 0 0 var(--br-ink), 2px 0 0 0 var(--br-ink);
+  }
+  .swatch-sm div { font-size: var(--br-text-sm); line-height: 1.35; }
+  .pairs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--br-space-3); }
+  .pair { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; font-weight: 700; }
+  .pair .mono { font-size: 12px; }
+
+  /* Type */
+  .specimen { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: var(--br-space-5); padding: var(--br-space-5) 0; border-bottom: 2px dashed var(--br-cream-deep); align-items: baseline; }
+  .specimen:last-child { border-bottom: 0; }
+  .specimen .meta { display: grid; gap: 4px; }
+  .specimen .meta strong { font-size: 15px; }
+  .scale td:first-child { white-space: nowrap; }
+
+  /* Pixel rules */
+  .rule-demo { display: grid; place-items: center; min-height: 150px; background: var(--br-paper); padding: var(--br-space-5); }
+  .rule-demo .px { width: 120px; height: 64px; background: var(--br-white); }
+  .bad-blur { width: 120px; height: 64px; background: var(--br-white); border-radius: 14px; box-shadow: 0 8px 24px rgba(8, 98, 136, 0.25); }
+  .bad-grad { width: 120px; height: 64px; background: linear-gradient(135deg, var(--br-sky), var(--br-deep)); border-radius: 999px; }
+  .stepped { width: 168px; height: 64px; background: linear-gradient(90deg, var(--br-cream) 0 25%, var(--br-sky) 25% 50%, var(--br-steel) 50% 75%, var(--br-deep) 75%); }
+  .verdict { display: flex; align-items: center; gap: 8px; font-weight: 800; }
+  .verdict.ok { color: var(--br-success-ink); }
+  .verdict.no { color: var(--br-error-ink); }
+  .verdict .icon { width: 16px; height: 16px; }
+  .band { display: grid; gap: 0; }
+  .band .fill { height: 48px; background: var(--br-sky-soft); }
+
+  /* Components */
+  .demo { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--br-space-4); align-content: start; }
+  .demo h3 { font-size: 20px; }
+
+  /* Icons */
+  .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--br-space-3); }
+  .icon-cell { display: grid; justify-items: center; gap: 8px; padding: var(--br-space-4) var(--br-space-2); background: var(--br-white); color: var(--br-deep); }
+  .icon-cell .label { color: var(--br-muted); }
+
+  /* Motion */
+  .motion-cell { display: grid; place-items: center; gap: var(--br-space-3); min-height: 200px; text-align: center; }
+  .motion-cell .mascot { width: 96px; }
+  .steam-demo { position: relative; width: 96px; height: 120px; }
+  .steam-demo .mascot { position: absolute; bottom: 0; left: 0; }
+  .steam-demo .puff { width: 36px; left: 40px; top: 30px; }
+  .steam-demo .puff-b { animation-delay: calc(var(--br-frame) * 9); }
+
+  @media (max-width: 960px) {
+    .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .g3 { grid-template-columns: minmax(0, 1fr); }
+    .top .intro { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .g2, .g4 { grid-template-columns: minmax(0, 1fr); }
+    .specimen { grid-template-columns: 1fr; gap: var(--br-space-2); }
+    .sizes { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top bg-dots">
+  <div class="wrap">
+    <img class="pixel" src="logo/lockup.svg" width="248" height="96" alt="Boiler Room">
+    <div class="intro">
+      <div class="grid" style="gap: 16px">
+        <span class="label eyebrow"><b>v0</b> Design system · draft for review</span>
+        <h1 class="display" style="font-size: 56px">Light, pixelated and a little bit cute.</h1>
+        <p class="lede">Everything Boiler Room looks like, for the founders it's made for: the logo, four colours, the type, the pixel rules and a few components. The samples show it on real screens. They are samples, not the app.</p>
+      </div>
+      <div class="samples">
+        <a class="btn btn-primary" href="samples/landing.html">Landing page <i class="icon" data-icon="arrow-right"></i></a>
+        <a class="btn" href="samples/dashboard.html">Dashboard</a>
+        <a class="btn" href="samples/script-review.html">Script review</a>
+      </div>
+    </div>
+    <nav class="toc label" aria-label="Sections">
+      <a href="#principles">Principles</a><a href="#logo">Logo</a><a href="#colour">Colour</a><a href="#type">Type</a><a href="#pixels">Pixel rules</a><a href="#components">Components</a><a href="#icons">Icons</a><a href="#motion">Motion</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section id="principles">
+  <div class="wrap">
+    <div class="head"><span class="label eyebrow"><b>01</b> Principles</span><h2>Six rules that make it Boiler Room</h2></div>
+    <div class="grid g3">
+      <div class="card principle"><i class="icon" data-icon="sparkle"></i><h4>Light and warm</h4><p>Butter paper, sky steam, deep blue pipes. Never a dark page. Dark is only for the customer's own video.</p></div>
+      <div class="card principle"><i class="icon" data-icon="eye"></i><h4>Pixel art, readable words</h4><p>The mascot, icons, frames and big numbers are pixels. Every word is set in a smooth, readable face.</p></div>
+      <div class="card principle"><i class="icon" data-icon="film"></i><h4>Whole pixels, hard shadows</h4><p>Outlines, notches and shadows are whole pixels, 3px each. No rounded corners, no blur, no smooth gradients.</p></div>
+      <div class="card principle"><i class="icon" data-icon="clock"></i><h4>Moves in frames</h4><p>Animation steps at 12 frames a second, like a sprite. It is a function of the frame, the same rule the video renderer follows.</p></div>
+      <div class="card principle"><i class="icon" data-icon="shield"></i><h4>Cute, but honest</h4><p>Every number on screen shows its source. The tone is friendly; the claims are checked.</p></div>
+      <div class="card card-cream principle"><i class="icon" data-icon="user"></i><h4>Founder to founder</h4><p>Short, plain and a little warm. Talk about launch day, not AI. Show who on the crew did what, and when you need to step in.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="logo">
+  <div class="wrap">
+    <div class="head">
+      <span class="label eyebrow"><b>02</b> Logo</span>
+      <h2>A little boiler with a play button for a belly</h2>
+      <p>The mark is a 24 by 24 pixel boiler: steam on top, a valve on the side, a screen on its belly. The wordmark is drawn on the same grid. Both are generated by <code>pixel-art.mjs</code>.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card logo-tile white"><img class="pixel" src="logo/lockup.svg" width="248" height="96" alt="Lockup on white"></div>
+      <div class="card logo-tile cream"><img class="pixel" src="logo/lockup.svg" width="248" height="96" alt="Lockup on butter"></div>
+      <div class="card logo-tile deep"><img class="pixel" src="logo/lockup-on-deep.svg" width="248" height="96" alt="Lockup on deep blue"></div>
+    </div>
+    <div class="grid g2" style="margin-top: 40px">
+      <div class="card demo">
+        <h3>Sizes: whole multiples only</h3>
+        <div class="sizes">
+          <figure><img class="pixel" src="logo/boiler-mark.svg" width="24" height="24" alt=""><span class="label muted">24</span></figure>
+          <figure><img class="pixel" src="logo/boiler-mark.svg" width="48" height="48" alt=""><span class="label muted">48</span></figure>
+          <figure><img class="pixel" src="logo/boiler-mark.svg" width="96" height="96" alt=""><span class="label muted">96</span></figure>
+          <figure><img class="pixel" src="logo/wordmark.svg" width="136" height="20" alt=""><span class="label muted">Wordmark 2x</span></figure>
+        </div>
+        <p class="note">The mark is 24 pixels square, so draw it at 24, 48, 72 or 96px. In-between sizes smear the pixels. Keep one mark-width of clear space around it.</p>
+      </div>
+      <div class="card demo">
+        <h3>Don't</h3>
+        <div class="grid g3" style="gap: 12px">
+          <div class="dont"><figure><img src="logo/boiler-mark.svg" width="64" height="64" alt="" style="image-rendering: auto; filter: blur(1.2px)"></figure><span class="note">Smooth or blur it</span></div>
+          <div class="dont"><figure><img src="logo/boiler-mark.svg" width="64" height="64" alt="" style="transform: rotate(-14deg)"></figure><span class="note">Rotate it</span></div>
+          <div class="dont"><figure><img src="logo/boiler-mark.svg" width="64" height="64" alt="" style="filter: hue-rotate(140deg)"></figure><span class="note">Recolour it</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="colour">
+  <div class="wrap">
+    <div class="head">
+      <span class="label eyebrow"><b>03</b> Colour</span>
+      <h2>Four colours, from the boiler room</h2>
+      <p>The page is butter paper, cards are white, and blue does the talking. Pink and mint are tiny accents for states, never decoration.</p>
+    </div>
+    <div class="grid g4">
+      <div class="card swatch-big"><div class="chip" style="background: var(--br-deep)"></div><div class="info"><strong>Pipe</strong><span class="mono">#086288</span><span class="note">Headings, primary buttons, outlines. 6.5:1 on paper.</span></div></div>
+      <div class="card swatch-big"><div class="chip" style="background: var(--br-steel)"></div><div class="info"><strong>Steel</strong><span class="mono">#4D8DBA</span><span class="note">The boiler's body, field outlines, large text only. 3.5:1.</span></div></div>
+      <div class="card swatch-big"><div class="chip" style="background: var(--br-sky)"></div><div class="info"><strong>Steam</strong><span class="mono">#97D7FF</span><span class="note">Fills, hard shadows, highlights. Never text on light.</span></div></div>
+      <div class="card swatch-big"><div class="chip" style="background: var(--br-cream)"></div><div class="info"><strong>Butter</strong><span class="mono">#FFEFC4</span><span class="note">Warm panels, claim highlights, the belly screen.</span></div></div>
+    </div>
+
+    <div class="grid g2" style="margin-top: 40px">
+      <div class="card demo">
+        <h3>Derived</h3>
+        <div class="grid g2" style="gap: 14px">
+          <div class="swatch-sm"><span style="background: var(--br-ink)"></span><div><strong>Ink</strong> <span class="mono">#0B2E40</span><br><span class="muted">Body text. 13.7:1</span></div></div>
+          <div class="swatch-sm"><span style="background: var(--br-muted)"></span><div><strong>Muted</strong> <span class="mono">#3D6A87</span><br><span class="muted">Captions. 5.6:1</span></div></div>
+          <div class="swatch-sm"><span style="background: var(--br-paper)"></span><div><strong>Paper</strong> <span class="mono">#FFFBEF</span><br><span class="muted">Page background</span></div></div>
+          <div class="swatch-sm"><span style="background: var(--br-white)"></span><div><strong>White</strong> <span class="mono">#FFFFFF</span><br><span class="muted">Cards, inputs</span></div></div>
+          <div class="swatch-sm"><span style="background: var(--br-sky-soft)"></span><div><strong>Sky soft</strong> <span class="mono">#DDF2FF</span><br><span class="muted">Cool panels, hover</span></div></div>
+          <div class="swatch-sm"><span style="background: var(--br-cream-deep)"></span><div><strong>Butter deep</strong> <span class="mono">#F4DB9A</span><br><span class="muted">Dashed rules, dots</span></div></div>
+          <div class="swatch-sm"><span style="background: var(--br-pink)"></span><div><strong>Blush</strong> <span class="mono">#FF9EB5</span><br><span class="muted">The mascot's cheeks</span></div></div>
+          <div class="swatch-sm"><span style="background: var(--br-mint)"></span><div><strong>Mint</strong> <span class="mono">#9FE3C1</span><br><span class="muted">Done, sparingly</span></div></div>
+        </div>
+      </div>
+      <div class="card demo">
+        <h3>Status: soft fill, strong ink</h3>
+        <div class="pairs">
+          <div class="pair" style="background: var(--br-success-soft); color: var(--br-success-ink)">Done <span class="mono">6.2:1</span></div>
+          <div class="pair" style="background: var(--br-info-soft); color: var(--br-info-ink)">Working <span class="mono">5.9:1</span></div>
+          <div class="pair" style="background: var(--br-warning-soft); color: var(--br-warning-ink)">Queued <span class="mono">6.0:1</span></div>
+          <div class="pair" style="background: var(--br-attention-soft); color: var(--br-attention-ink)">Needs you <span class="mono">6.0:1</span></div>
+          <div class="pair" style="background: var(--br-error-soft); color: var(--br-error-ink)">Failed <span class="mono">5.7:1</span></div>
+          <div class="pair" style="background: var(--br-deep); color: var(--br-white)">On deep <span class="mono">6.8:1</span></div>
+        </div>
+        <p class="note">"Needs you" is pink, the mascot's blush. It is the one colour that means a person has to act.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="type">
+  <div class="wrap">
+    <div class="head">
+      <span class="label eyebrow"><b>04</b> Type</span>
+      <h2>Pixel art, readable words</h2>
+      <p>The pixels live in the art, the frames and the big numbers. Every word you read is set in a smooth, readable face. All four fonts are free on Google Fonts.</p>
+    </div>
+    <div class="card">
+      <div class="specimen">
+        <div class="meta"><strong>Bricolage Grotesque</strong><span class="label muted">Headings · buttons · tabs</span><span class="note">800 for big headings, 700 below 28px. Tight letter spacing.</span></div>
+        <div style="font: 800 52px / 1.02 var(--br-font-display); letter-spacing: -0.03em; color: var(--br-deep)">Give us a URL. Get your launch video.</div>
+      </div>
+      <div class="specimen">
+        <div class="meta"><strong>Nunito</strong><span class="label muted">Body · UI text</span><span class="note">400 to read, 700 and 800 to stress</span></div>
+        <div style="font-size: 19px">You're busy shipping. A small crew of agents reads your site, writes the script and cuts it for every channel. <strong>Nothing renders until you approve the script.</strong></div>
+      </div>
+      <div class="specimen">
+        <div class="meta"><strong>JetBrains Mono</strong><span class="label muted">Labels · badges · data · timecodes</span><span class="note">Labels: 600, 11px, upper case, spaced. Data: 400, tabular numbers. Shared with Latchkey.</span></div>
+        <div style="display: grid; gap: 10px"><span class="label" style="font-size: 12px">Step 4 of 10 · paused for you · launch in 11 days</span><span class="mono" style="font-size: 15px">"quote": "Teams on Nova cut build times by 40% in their first month." · 0:04.12</span></div>
+      </div>
+      <div class="specimen">
+        <div class="meta"><strong>Pixelify Sans</strong><span class="label muted">Scoreboard numbers only</span><span class="note">700, 24px and up. Countdowns, counts, the 18. Never words.</span></div>
+        <div style="display: flex; gap: 40px; align-items: end; flex-wrap: wrap"><span class="score" style="font-size: 72px; color: var(--br-attention-ink)">11</span><span class="score" style="font-size: 48px">18</span><span class="score" style="font-size: 32px">16:9</span><span class="score" style="font-size: 24px">0:20</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top: 32px; overflow-x: auto">
+      <table class="table scale">
+        <thead><tr><th>Token</th><th>Size / line</th><th>Face</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td><code>--br-text-display</code></td><td>64 / 1.0</td><td>Bricolage 800</td><td>Landing hero only</td></tr>
+          <tr><td><code>--br-text-h1</code></td><td>44 / 1.05</td><td>Bricolage 800</td><td>Page title</td></tr>
+          <tr><td><code>--br-text-h2</code></td><td>32 / 1.1</td><td>Bricolage 800</td><td>Section</td></tr>
+          <tr><td><code>--br-text-h3</code></td><td>24 / 1.15</td><td>Bricolage 700</td><td>Card title</td></tr>
+          <tr><td><code>--br-text-h4</code></td><td>19 / 1.2</td><td>Bricolage 700</td><td>Small title</td></tr>
+          <tr><td><code>--br-text-lg</code></td><td>18 / 1.6</td><td>Nunito 400</td><td>Lede</td></tr>
+          <tr><td><code>--br-text-md</code></td><td>16 / 1.6</td><td>Nunito 400</td><td>Body</td></tr>
+          <tr><td><code>--br-text-sm</code></td><td>14 / 1.5</td><td>Nunito 400</td><td>Secondary</td></tr>
+          <tr><td><code>--br-text-label</code></td><td>11 / 1.4</td><td>JetBrains Mono 600</td><td>Labels, upper case</td></tr>
+          <tr><td><code>--br-text-mono</code></td><td>13 / 1.5</td><td>JetBrains Mono 400</td><td>Data</td></tr>
+          <tr><td><code>.score</code></td><td>24 and up</td><td>Pixelify Sans 700</td><td>Numbers only</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="pixels">
+  <div class="wrap">
+    <div class="head">
+      <span class="label eyebrow"><b>05</b> Pixel rules</span>
+      <h2>One pixel, 3px, sets every edge</h2>
+      <p>Frames are a notched outline plus a stepped hard shadow, built from <code>box-shadow</code> so any element can wear one. Change <code>--br-px</code> and every outline, notch and shadow follows.</p>
+    </div>
+    <div class="grid g4">
+      <div class="card card-flat demo"><div class="rule-demo"><div class="px"></div></div><p class="verdict ok"><i class="icon" data-icon="check"></i>Notched frame, hard shadow</p></div>
+      <div class="card card-flat demo"><div class="rule-demo"><div class="stepped"></div></div><p class="verdict ok"><i class="icon" data-icon="check"></i>Colour in hard steps</p></div>
+      <div class="card card-flat demo"><div class="rule-demo"><div class="bad-blur"></div></div><p class="verdict no"><i class="icon" data-icon="warning"></i>Rounded corners, soft shadow</p></div>
+      <div class="card card-flat demo"><div class="rule-demo"><div class="bad-grad"></div></div><p class="verdict no"><i class="icon" data-icon="warning"></i>Smooth gradients, pills</p></div>
+    </div>
+    <div class="grid g3" style="margin-top: 40px">
+      <div class="card demo">
+        <h3>Frame sizes</h3>
+        <div class="row" style="gap: 28px">
+          <div class="px" style="--br-px: 2px; width: 64px; height: 40px; background: var(--br-white)"></div>
+          <div class="px" style="width: 64px; height: 40px; background: var(--br-white)"></div>
+          <div class="px" style="--br-px: 4px; width: 64px; height: 40px; background: var(--br-white)"></div>
+        </div>
+        <p class="note">2px for badges and fields, 3px by default, 4px for hero moments. Never mix two sizes in one component.</p>
+      </div>
+      <div class="card demo">
+        <h3>Dithered edges</h3>
+        <div class="band"><div class="fill"></div><div class="dither"></div></div>
+        <p class="note">Sections meet in a 12px band: solid, checker, sparse. It replaces a fade.</p>
+      </div>
+      <div class="card demo">
+        <h3>Spacing on a 4px grid</h3>
+        <div class="row" style="align-items: end; gap: 10px">
+          <span style="width: 4px; height: 4px; background: var(--br-deep)"></span>
+          <span style="width: 8px; height: 8px; background: var(--br-deep)"></span>
+          <span style="width: 12px; height: 12px; background: var(--br-deep)"></span>
+          <span style="width: 16px; height: 16px; background: var(--br-deep)"></span>
+          <span style="width: 24px; height: 24px; background: var(--br-deep)"></span>
+          <span style="width: 32px; height: 32px; background: var(--br-deep)"></span>
+          <span style="width: 48px; height: 48px; background: var(--br-deep)"></span>
+          <span style="width: 64px; height: 64px; background: var(--br-deep)"></span>
+        </div>
+        <p class="note mono">4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="components">
+  <div class="wrap">
+    <div class="head">
+      <span class="label eyebrow"><b>06</b> Components</span>
+      <h2>A few pieces, to show the rules</h2>
+      <p>Not a library. Each one shows how the tokens combine, so the app can rebuild it in its own framework. Hover and press the buttons.</p>
+    </div>
+    <div class="grid g2">
+      <div class="card demo">
+        <h3>Buttons</h3>
+        <div class="row">
+          <button class="btn btn-primary">Approve script</button>
+          <button class="btn">Secondary</button>
+          <button class="btn btn-steam">Fire it up</button>
+          <button class="btn btn-cream">Request changes</button>
+        </div>
+        <div class="row">
+          <button class="btn btn-primary btn-sm"><i class="icon" data-icon="plus"></i>Small</button>
+          <button class="btn btn-ghost">Ghost</button>
+          <button class="btn btn-danger btn-sm">Delete video</button>
+          <button class="btn" disabled>Disabled</button>
+        </div>
+        <p class="note">Hover lifts one pixel, press drops into the shadow. Both change in one frame, with no easing. Labels are Bricolage Grotesque 700.</p>
+      </div>
+      <div class="card demo">
+        <h3>Fields</h3>
+        <form class="url-field px" onsubmit="return false"><i class="icon" data-icon="globe"></i><input placeholder="yourproduct.com" aria-label="URL"><button class="btn btn-primary btn-sm">Fire it up</button></form>
+        <div class="field"><label class="label" for="f1">Video name</label><input class="input" id="f1" value="Nova launch"></div>
+        <div class="field"><label class="label" for="f2">Voice</label><input class="input" id="f2" value="roberta-from-nowhere" aria-invalid="true"><span class="field-error">No voice with that name. Pick one from the list.</span></div>
+        <div class="row"><label class="check"><input type="checkbox" checked> Burn in captions</label><label class="toggle"><input type="checkbox" checked> Music bed</label></div>
+      </div>
+      <div class="card demo">
+        <h3>Status badges</h3>
+        <div class="row" style="gap: 10px">
+          <span class="badge badge-queued">Queued</span>
+          <span class="badge badge-working">Rendering</span>
+          <span class="badge badge-needs">Needs you</span>
+          <span class="badge badge-done">Delivered</span>
+          <span class="badge badge-failed">Needs a fix</span>
+          <span class="badge badge-plain">16:9</span>
+        </div>
+        <h3 style="margin-top: 8px">Progress</h3>
+        <div class="progress"><span style="width: 62%"></span></div>
+        <h3 style="margin-top: 8px">Tabs and toggles</h3>
+        <div class="tabs" role="tablist"><button class="tab" aria-selected="true">Scene 2</button><button class="tab" aria-selected="false">Claims</button><button class="tab" aria-selected="false">Exports</button></div>
+        <div class="seg"><button aria-pressed="true">16:9</button><button aria-pressed="false">9:16</button><button aria-pressed="false">1:1</button></div>
+      </div>
+      <div class="card demo">
+        <h3>Alerts</h3>
+        <div class="alert alert-needs"><i class="icon" data-icon="sparkle"></i><p><strong>Your script is ready.</strong> Nothing renders until you approve it.</p></div>
+        <div class="alert alert-done"><i class="icon" data-icon="check"></i><p><strong>Delivered.</strong> 18 files are ready to download.</p></div>
+        <div class="alert alert-failed"><i class="icon" data-icon="warning"></i><p><strong>Sent back.</strong> "Builds 73% faster" has no source.</p></div>
+        <div class="alert"><i class="icon" data-icon="cloud"></i><p><strong>Rendering.</strong> Scene 3 of 4.</p></div>
+      </div>
+      <div class="card demo">
+        <h3>Claims</h3>
+        <p style="font: 700 22px / 1.3 var(--br-font-display)"><span class="claim">40%</span> faster builds</p>
+        <div class="claim-card"><span class="label">Source · build-times</span><blockquote>"Teams on Nova cut build times by <span class="claim">40%</span> in their first month."</blockquote><span class="source">nova.example.com/customers</span></div>
+        <p class="note">Any number on screen gets the butter highlight and a pixel underline. Its source is one click away.</p>
+      </div>
+      <div class="card demo">
+        <h3>Crew tiles</h3>
+        <div class="row">
+          <span class="crew crew-done"><i class="icon" data-icon="search"></i></span>
+          <span class="crew crew-done"><i class="icon" data-icon="clapper"></i></span>
+          <span class="crew crew-active"><i class="icon" data-icon="user"></i></span>
+          <span class="crew"><i class="icon" data-icon="brush"></i></span>
+          <span class="crew crew-waiting"><i class="icon" data-icon="gear"></i></span>
+        </div>
+        <p class="note">Done is mint, the step that needs a person is pink and bobs, working is sky, and waiting is paper with a steel outline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="icons">
+  <div class="wrap">
+    <div class="head">
+      <span class="label eyebrow"><b>07</b> Icons</span>
+      <h2>Twelve by twelve, one colour</h2>
+      <p>Every icon is drawn on a 12 pixel grid in <code>currentColor</code>, so it takes the text colour. Use them at 12, 24 or 36px. Add one by drawing its grid in <code>pixel-art.mjs</code>.</p>
+    </div>
+    <div class="icons" id="icon-grid"></div>
+  </div>
+</section>
+
+<section id="motion">
+  <div class="wrap">
+    <div class="head">
+      <span class="label eyebrow"><b>08</b> Motion</span>
+      <h2>Frames, not curves</h2>
+      <p>One frame is 83ms, 12 a second. Animations use <code>steps()</code>, never an ease. Everything stops when the viewer asks for reduced motion.</p>
+    </div>
+    <div class="grid g4">
+      <div class="card motion-cell"><div class="mascot"><img src="logo/boiler-mark.svg" alt=""><img class="blink" src="logo/boiler-mark-blink.svg" alt=""></div><span class="label muted">Blink · 2 frames, every 4s</span></div>
+      <div class="card motion-cell"><div class="steam-demo"><div class="mascot"><img src="logo/boiler-mark.svg" alt=""></div><img class="mascot puff" src="logo/puff.svg" alt="" style="position: absolute; opacity: 0; animation: br-rise calc(var(--br-frame) * 18) steps(9) infinite"><img class="mascot puff puff-b" src="logo/puff.svg" alt="" style="position: absolute; opacity: 0; animation: br-rise calc(var(--br-frame) * 18) steps(9) infinite"></div><span class="label muted">Steam · 9 steps</span></div>
+      <div class="card motion-cell"><span class="crew crew-active"><i class="icon" data-icon="user"></i></span><span class="label muted">Needs you · bob 1px</span></div>
+      <div class="card motion-cell"><span class="badge badge-working">Rendering</span><span class="label muted">Working · LED blinks</span></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="dither dither-deep dither-up" style="background-color: var(--br-paper)"></div>
+<footer style="background: var(--br-deep); color: var(--br-sky-soft); padding: 32px 0">
+  <div class="wrap row" style="justify-content: space-between">
+    <img class="pixel" src="logo/lockup-on-deep.svg" width="124" height="48" alt="Boiler Room">
+    <span style="font-size: 14px">Draft v0 · tokens in <code>tokens.css</code> and <code>tokens.json</code> · art from <code>pixel-art.mjs</code></span>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('icon-grid');
+    for (const [name, markup] of Object.entries(window.BR_ICONS)) {
+      grid.insertAdjacentHTML('beforeend', `<div class="card card-flat icon-cell"><span class="icon">${markup}</span><span class="label">${name}</span></div>`);
+    }
+  });
+</script>
+</body>
+</html>
