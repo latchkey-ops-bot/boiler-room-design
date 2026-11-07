@@ -1,0 +1,1118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boiler Room System Map</title>
+<style>
+  /* Neutral placeholder palette. The brand is not chosen yet: swap these tokens and nothing else. */
+  :root {
+    color-scheme: light;
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace;
+
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface-2: #ecebe5;
+    --track: #e2e1da;
+    --ink: #1d1d1b;
+    --ink-2: #55554f;
+    --line: #6f6f68;
+    --line-soft: #d3d2ca;
+    --on-fill: #ffffff;
+
+    /* Status set */
+    --status-live: #1b7a4b;
+    --status-building: #2360a5;
+    --status-planned: #6a6a64;
+    --status-decide: #a65a00;
+
+    /* Autonomy set */
+    --auto-agent: #4a5478;
+    --auto-approval: #6b3db0;
+    --auto-customer: #0d7687;
+    --auto-human: #b0244e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #141413;
+      --surface: #1f1f1d;
+      --surface-2: #2a2a27;
+      --track: #2e2e2b;
+      --ink: #f1f0ea;
+      --ink-2: #b3b2aa;
+      --line: #96958d;
+      --line-soft: #3d3d39;
+      --on-fill: #141413;
+      --status-live: #5ccf95;
+      --status-building: #80b6f2;
+      --status-planned: #a8a79f;
+      --status-decide: #f1b04f;
+      --auto-agent: #aeb6d0;
+      --auto-approval: #bb9ff2;
+      --auto-customer: #52c6d7;
+      --auto-human: #f27ea0;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #141413;
+    --surface: #1f1f1d;
+    --surface-2: #2a2a27;
+    --track: #2e2e2b;
+    --ink: #f1f0ea;
+    --ink-2: #b3b2aa;
+    --line: #96958d;
+    --line-soft: #3d3d39;
+    --on-fill: #141413;
+    --status-live: #5ccf95;
+    --status-building: #80b6f2;
+    --status-planned: #a8a79f;
+    --status-decide: #f1b04f;
+    --auto-agent: #aeb6d0;
+    --auto-approval: #bb9ff2;
+    --auto-customer: #52c6d7;
+    --auto-human: #f27ea0;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 15px/1.45 var(--font-sans);
+  }
+  main { max-width: 1424px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  h1 { font-size: 26px; line-height: 1.2; margin: 0; }
+  h2 { font-size: 20px; line-height: 1.25; margin: 0; }
+  h3 { font-size: 15px; line-height: 1.3; margin: 0; }
+  p { margin: 0; }
+  code, .mono { font-family: var(--font-mono); }
+
+  .defs { position: absolute; width: 0; height: 0; }
+
+  .page-head { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline; justify-content: space-between; }
+  .page-head .sub { color: var(--ink-2); }
+  .updated { color: var(--ink-2); white-space: nowrap; }
+  .theme-toggle {
+    font: inherit; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line-soft); border-radius: 6px; padding: 4px 10px; cursor: pointer;
+  }
+
+  .problems {
+    border: 2px solid var(--auto-human); background: var(--surface); border-radius: 8px;
+    padding: 10px 14px; font-weight: 600;
+  }
+  .problems[hidden] { display: none; }
+
+  .panel { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 16px 18px; }
+
+  /* Key */
+  .key { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 32px; }
+  .key h3 { margin-bottom: 6px; }
+  .key ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+  .key li { display: flex; align-items: center; gap: 10px; color: var(--ink-2); font-size: 14px; }
+  .key li svg { flex: none; display: block; }
+  .key li b { color: var(--ink); font-weight: 600; }
+  .lines-key { display: flex; flex-wrap: wrap; gap: 8px 28px; color: var(--ink-2); font-size: 14px; }
+  .lines-key span { display: inline-flex; align-items: center; gap: 8px; }
+
+  /* Scoreboard */
+  .tallies { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+  .tally { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 14px 18px; }
+  .tally-value { font-size: 26px; font-weight: 700; line-height: 1.2; }
+  .tally-note { color: var(--ink-2); }
+  .questions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+  .question { display: grid; gap: 10px; align-content: start; }
+  .question ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 14px; }
+  .question p { font-size: 14px; color: var(--ink-2); }
+  .question p b { color: var(--ink); font-weight: 600; }
+  .counters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+  .counters div { background: var(--surface-2); border-radius: 8px; padding: 8px 12px; }
+  .counters dt { font-size: 13px; color: var(--ink-2); }
+  .counters dd { margin: 0; font-size: 24px; font-weight: 700; line-height: 1.2; }
+
+  /* Diagrams */
+  figure { margin: 0; }
+  figure h2 { margin-bottom: 4px; }
+  figcaption { color: var(--ink-2); margin-top: 8px; max-width: 980px; }
+  .lead { color: var(--ink-2); margin-bottom: 10px; max-width: 980px; }
+  .diagram-scroll { overflow-x: auto; background: var(--surface-2); border-radius: 10px; padding: 12px; }
+  .diagram { display: block; width: 100%; height: auto; min-width: 900px; margin: 0 auto; }
+  #technical-svg { max-width: 1264px; }
+  #company-svg { max-width: 1424px; }
+
+  .card { fill: var(--surface); stroke: var(--status-planned); }
+  .stripe { fill: var(--auto-agent); }
+  .name { font: 600 14.5px var(--font-sans); fill: var(--ink); }
+  .owner { font: 600 12.5px var(--font-sans); fill: var(--ink); }
+  .detail { font: 400 12.5px var(--font-sans); fill: var(--ink-2); }
+  .detail .mono, .edge-label .mono { font-family: var(--font-mono); font-size: 11.5px; }
+  .edge-label { font: 500 12px var(--font-sans); fill: var(--ink-2); }
+  .lane { font: 700 11px var(--font-sans); letter-spacing: .08em; fill: var(--ink-2); }
+  .lane-note { font: 500 12px var(--font-sans); fill: var(--ink-2); }
+  .cell { fill: var(--surface-2); stroke: var(--line-soft); }
+  .cell-text { font: 600 12.5px var(--font-sans); fill: var(--ink); text-anchor: middle; }
+  .math-big { font: 700 28px var(--font-sans); fill: var(--ink); text-anchor: middle; }
+  .math-word { font: 500 12px var(--font-sans); fill: var(--ink-2); text-anchor: middle; }
+  .math-op { font: 600 18px var(--font-sans); fill: var(--ink-2); text-anchor: middle; }
+  .thumb { fill: none; stroke: var(--ink-2); stroke-width: 1.5; }
+
+  .flow { fill: none; stroke: var(--line); stroke-width: 1.75; marker-end: url(#arrow); }
+  .arrow-head { fill: var(--line); }
+  .ring { fill: none; stroke: var(--ink-2); stroke-width: 2.25; marker-end: url(#arrow-ring); }
+  .arrow-head-ring { fill: var(--ink-2); }
+  .track { fill: none; stroke: var(--track); stroke-width: 32; }
+  .loop { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-dasharray: 10 7; marker-end: url(#arrow-loop); }
+  .loop-branch { fill: var(--ink); }
+  .arrow-open { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .loop-title { font: 700 12.5px var(--font-sans); fill: var(--ink); }
+
+  /* Status drives the border. Dotted means not built yet; only live gets a solid outline. */
+  [data-status="live"] > .card { stroke: var(--status-live); stroke-width: 2.5; }
+  [data-status="building"] > .card { stroke: var(--status-building); stroke-width: 2.25; stroke-dasharray: 9 5; }
+  [data-status="planned"] > .card { stroke: var(--status-planned); stroke-width: 1.75; stroke-dasharray: .5 5; stroke-linecap: round; }
+  [data-status="decide"] > .card { stroke: var(--status-decide); stroke-width: 2.5; stroke-dasharray: 14 4 3 4; }
+
+  /* Autonomy drives the left stripe: solid, hatched, dotted or crossed. */
+  [data-autonomy="agent"] > .stripe { fill: var(--auto-agent); }
+  [data-autonomy="approval"] > .stripe { fill: url(#pattern-approval); }
+  [data-autonomy="customer"] > .stripe { fill: url(#pattern-customer); }
+  [data-autonomy="human"] > .stripe { fill: url(#pattern-human); }
+  .pat-approval { stroke: var(--auto-approval); stroke-width: 2.5; }
+  .pat-customer { fill: var(--auto-customer); }
+  .pat-human { stroke: var(--auto-human); stroke-width: 1.75; }
+
+  /* Chips */
+  .chip-bg { stroke-width: 1.25; }
+  .chip-text { font: 700 10.5px var(--font-sans); letter-spacing: .04em; fill: currentColor; }
+  .chip[data-value="live"] { color: var(--on-fill); }
+  .chip[data-value="live"] .chip-bg { fill: var(--status-live); stroke: var(--status-live); }
+  .chip[data-value="building"] { color: var(--status-building); }
+  .chip[data-value="building"] .chip-bg { fill: var(--surface); stroke: var(--status-building); stroke-dasharray: 4 2; }
+  .chip[data-value="planned"] { color: var(--status-planned); }
+  .chip[data-value="planned"] .chip-bg { fill: var(--surface); stroke: var(--status-planned); }
+  .chip[data-value="decide"] { color: var(--on-fill); }
+  .chip[data-value="decide"] .chip-bg { fill: var(--status-decide); stroke: var(--status-decide); }
+  .chip[data-value="agent"] { color: var(--auto-agent); }
+  .chip[data-value="agent"] .chip-bg { fill: var(--surface); stroke: var(--auto-agent); }
+  .chip[data-value="approval"] { color: var(--auto-approval); }
+  .chip[data-value="approval"] .chip-bg { fill: var(--surface); stroke: var(--auto-approval); }
+  .chip[data-value="customer"] { color: var(--auto-customer); }
+  .chip[data-value="customer"] .chip-bg { fill: var(--surface); stroke: var(--auto-customer); }
+  .chip[data-value="human"] { color: var(--on-fill); }
+  .chip[data-value="human"] .chip-bg { fill: var(--auto-human); stroke: var(--auto-human); }
+  .glyph-fill { fill: currentColor; }
+  .glyph-line { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Diagram 2: the human boundary */
+  .zone { fill: var(--surface); stroke: var(--auto-human); stroke-width: 2.5; stroke-dasharray: 12 6; }
+  .zone-title { font: 700 14px var(--font-sans); letter-spacing: .08em; fill: var(--auto-human); }
+  .zone-note { font: 400 13px var(--font-sans); fill: var(--ink-2); }
+  .zone-founder { font: 700 13px var(--font-sans); fill: var(--ink); }
+  .tab-box { fill: var(--surface); stroke: var(--auto-human); stroke-width: 2; }
+  .tab-text { font: 700 12px var(--font-sans); fill: var(--ink); }
+  .tab .glyph-fill { fill: var(--auto-human); }
+
+  /* Guard rails */
+  .rails { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-top: 12px; }
+  .rail { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 8px; padding: 10px 14px; display: grid; gap: 4px; align-content: start; }
+  .rail-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .rail-head svg { flex: none; display: block; }
+  .rail-value { font-weight: 700; }
+  .rail p { color: var(--ink-2); font-size: 14px; }
+  .rail-limit { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--ink-2); }
+
+  /* render.mjs sets data-view to capture one diagram at a time */
+  :root[data-view="technical"] [data-show="company"],
+  :root[data-view="company"] [data-show="technical"],
+  :root[data-view] .theme-toggle { display: none; }
+
+  @media (max-width: 900px) {
+    body { padding: 16px; }
+    .key, .tallies, .questions { grid-template-columns: minmax(0, 1fr); }
+    .tally-value { font-size: 21px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Shared SVG definitions: arrowheads and the autonomy patterns. -->
+<svg class="defs" aria-hidden="true" focusable="false">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto">
+      <path class="arrow-head" d="M0 0.5 L10 5 L0 9.5 z"/>
+    </marker>
+    <marker id="arrow-ring" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" orient="auto">
+      <path class="arrow-head-ring" d="M0 0.5 L10 5 L0 9.5 z"/>
+    </marker>
+    <marker id="arrow-loop" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" orient="auto">
+      <path class="arrow-open" d="M1.5 1 L9 5 L1.5 9"/>
+    </marker>
+    <pattern id="pattern-approval" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+      <line class="pat-approval" x1="1.5" y1="0" x2="1.5" y2="5"/>
+    </pattern>
+    <pattern id="pattern-customer" patternUnits="userSpaceOnUse" width="5" height="5">
+      <circle class="pat-customer" cx="2.5" cy="2.5" r="1.6"/>
+    </pattern>
+    <pattern id="pattern-human" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)">
+      <line class="pat-human" x1="1.25" y1="0" x2="1.25" y2="5"/>
+      <line class="pat-human" x1="0" y1="1.25" x2="5" y2="1.25"/>
+    </pattern>
+  </defs>
+</svg>
+
+<main>
+  <header class="page-head">
+    <div>
+      <h1>Boiler Room system map</h1>
+      <p class="sub">How the product works, and how much of the company runs without the founder.</p>
+    </div>
+    <div>
+      <span class="updated">Last updated <b id="last-updated"></b></span>
+      <button class="theme-toggle" id="theme-toggle" type="button">Switch theme</button>
+    </div>
+  </header>
+
+  <p class="problems" id="map-problems" role="alert" hidden></p>
+
+  <section class="panel key" aria-label="Key">
+    <div>
+      <h3>Status: how far along it is</h3>
+      <ul id="key-status"></ul>
+    </div>
+    <div>
+      <h3>Autonomy: who does the work</h3>
+      <ul id="key-autonomy"></ul>
+    </div>
+  </section>
+
+  <section data-show="company" aria-labelledby="score-heading">
+    <h2 id="score-heading">Scoreboard</h2>
+    <div class="tallies">
+      <div class="tally">
+        <div class="tally-value" id="tally-agent"></div>
+        <div class="tally-note">Design target, not what runs today.</div>
+      </div>
+      <div class="tally">
+        <div class="tally-value" id="tally-live"></div>
+        <div class="tally-note">What actually runs on its own right now.</div>
+      </div>
+    </div>
+    <div class="questions">
+      <article class="panel question">
+        <h3>What did the agents deliver?</h3>
+        <dl class="counters">
+          <div><dt>Videos delivered</dt><dd id="count-videos"></dd></div>
+          <div><dt>Leads found</dt><dd id="count-leads"></dd></div>
+          <div><dt>Emails sent</dt><dd id="count-emails"></dd></div>
+          <div><dt>Replies</dt><dd id="count-replies"></dd></div>
+        </dl>
+      </article>
+      <article class="panel question">
+        <h3>What decisions did they make?</h3>
+        <p><b id="decisions-today"></b></p>
+        <p>Built to decide, once running:</p>
+        <ul>
+          <li>Scout: who is worth a sample</li>
+          <li>Validator: pass or reject a script</li>
+          <li>Art Director: which scenes to use</li>
+          <li>Quality Check: pass or send back</li>
+        </ul>
+        <p><b id="open-count"></b> <span id="open-list"></span></p>
+      </article>
+      <article class="panel question">
+        <h3>Where did you need to step in?</h3>
+        <p><b id="stepins-today"></b></p>
+        <p id="stepins-design"></p>
+        <ul id="stepins-list"></ul>
+      </article>
+    </div>
+  </section>
+
+  <section data-show="technical" aria-labelledby="technical-heading">
+    <figure>
+      <h2 id="technical-heading">Diagram 1: how Boiler Room works</h2>
+      <p class="lead">The design: a customer URL or a Scout lead goes through ten steps and comes out as finished video files.</p>
+      <div class="diagram-scroll">
+        <svg class="diagram" id="technical-svg" viewBox="0 0 1264 1560" role="img"
+             aria-label="Both ways in feed one ten-step pipeline. Dashed heavy arrows are the two feedback loops: Validator issues go back to the Director, and review failures go back to the Director or the Art Director.">
+
+          <!-- Lane labels -->
+          <text class="lane" x="24" y="20">CONTROL LAYER</text>
+          <text class="lane-note" x="396" y="20">Directs every node marked AGENT below</text>
+          <text class="lane" x="24" y="164">WAY IN: CUSTOMER</text>
+          <text class="lane" x="396" y="168">PIPELINE: SAME PATH FOR BOTH</text>
+          <text class="lane" x="928" y="164">WAY IN: LEAD</text>
+
+          <!-- Forward flow -->
+          <path class="flow" d="M304 78 H395"/>
+          <path class="flow" d="M304 222 H395"/>
+          <path class="flow" d="M928 222 H837"/>
+          <path class="flow" d="M616 266 V301"/>
+          <path class="flow" d="M616 390 V425"/>
+          <path class="flow" d="M616 514 V549"/>
+          <path class="flow" d="M616 638 V673"/>
+          <path class="flow" d="M616 762 V797"/>
+          <path class="flow" d="M616 886 V921"/>
+          <path class="flow" d="M616 1010 V1045"/>
+          <path class="flow" d="M616 1134 V1169"/>
+          <path class="flow" d="M616 1258 V1293"/>
+          <path class="flow" d="M616 1382 V1417"/>
+
+          <!-- Side inputs and outputs -->
+          <path class="flow" d="M304 718 H395"/>
+          <path class="flow" d="M304 966 H395"/>
+          <path class="flow" d="M304 1090 H395"/>
+          <path class="flow" d="M836 1090 H927"/>
+          <path class="flow" d="M164 1166 V1139"/>
+          <path class="flow" d="M396 1324 H305"/>
+          <path class="flow" d="M164 1396 V1417"/>
+          <path class="flow" d="M304 1466 H338 a12 12 0 0 0 12 -12 V1372 a12 12 0 0 1 12 -12 H395"/>
+
+          <!-- Feedback loop 1: Validator back to Director -->
+          <path class="loop" d="M836 470 H868 a12 12 0 0 0 12 -12 V372 a12 12 0 0 0 -12 -12 H838"/>
+
+          <!-- Feedback loop 2: Quality Check back to Art Director and Director -->
+          <path class="loop" d="M836 1214 H1228 a12 12 0 0 0 12 -12 V338 a12 12 0 0 0 -12 -12 H838"/>
+          <path class="loop" d="M1240 718 H838"/>
+          <circle class="loop-branch" cx="1240" cy="718" r="5"/>
+
+          <!-- Edge labels: what actually moves -->
+          <text class="edge-label" x="350" y="70" text-anchor="middle">hosts agents</text>
+          <text class="edge-label" x="350" y="214" text-anchor="middle">URL</text>
+          <text class="edge-label" x="882" y="214" text-anchor="middle">lead</text>
+          <text class="edge-label" x="628" y="288">brand tokens, product brief, claims</text>
+          <text class="edge-label" x="628" y="412"><tspan class="mono">campaign.json</tspan></text>
+          <text class="edge-label" x="628" y="536">passes the gate</text>
+          <text class="edge-label" x="628" y="660">approved script</text>
+          <text class="edge-label" x="628" y="784">scene picks</text>
+          <text class="edge-label" x="628" y="908">scenes and generated assets</text>
+          <text class="edge-label" x="628" y="1032">voice, music, sound effects, word timing</text>
+          <text class="edge-label" x="628" y="1156">rendered video</text>
+          <text class="edge-label" x="628" y="1280">passes review, with the review report</text>
+          <text class="edge-label" x="628" y="1404">delivers up to 18 exports</text>
+          <text class="edge-label" x="350" y="710" text-anchor="middle">new assets</text>
+          <text class="edge-label" x="350" y="958" text-anchor="middle">audio, timing</text>
+          <text class="edge-label" x="350" y="1082" text-anchor="middle">export only</text>
+          <text class="edge-label" x="882" y="1082" text-anchor="middle">runs on</text>
+          <text class="edge-label" x="176" y="1157">edits <tspan class="mono">campaign.json</tspan></text>
+          <text class="edge-label" x="350" y="1300" text-anchor="middle">email with</text>
+          <text class="edge-label" x="350" y="1316" text-anchor="middle">file link</text>
+          <text class="edge-label" x="176" y="1410">replies by webhook</text>
+          <text class="edge-label" x="312" y="1484">replies</text>
+
+          <text class="loop-title" x="892" y="408">Feedback loop 1: validator issues</text>
+          <text class="detail" x="892" y="426">Back to the Director with a fix message</text>
+          <text class="loop-title" x="1226" y="680" text-anchor="end">Feedback loop 2: review failures</text>
+          <text class="detail" x="1226" y="698" text-anchor="end">Back to the Director or the Art Director</text>
+
+          <!-- Control layer -->
+          <g data-node="naive-account" data-chips="bottom" transform="translate(24 30)">
+            <rect class="card" width="280" height="96" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46">API key verified.</text>
+          </g>
+          <g data-node="naive-team" data-chips="top" data-show-autonomy transform="translate(396 30)">
+            <rect class="card" width="812" height="96" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <rect class="cell" x="22" y="42" width="186" height="38" rx="6"/>
+            <text class="cell-text" x="115" y="66">Coordinator</text>
+            <rect class="cell" x="216" y="42" width="186" height="38" rx="6"/>
+            <text class="cell-text" x="309" y="66">Shared board</text>
+            <rect class="cell" x="410" y="42" width="186" height="38" rx="6"/>
+            <text class="cell-text" x="503" y="66">Budgets</text>
+            <rect class="cell" x="604" y="42" width="186" height="38" rx="6"/>
+            <text class="cell-text" x="697" y="66">Approval pauses</text>
+          </g>
+
+          <!-- Two ways in -->
+          <g data-node="dashboard" data-chips="bottom" data-show-autonomy transform="translate(24 174)">
+            <rect class="card" width="280" height="96" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46">Next.js. A customer enters a URL.</text>
+          </g>
+          <g data-node="scout" data-chips="bottom" data-show-autonomy transform="translate(928 174)">
+            <rect class="card" width="280" height="96" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46">Finds a lead.</text>
+          </g>
+
+          <!-- The ten-step pipeline -->
+          <g data-node="researcher" data-chips="top" data-show-autonomy transform="translate(396 178)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="47">Playwright captures real screenshots, colours, fonts, logo.</text>
+            <text class="detail" x="22" y="65">Extracts claims quoted word for word, with source URL.</text>
+          </g>
+          <g data-node="director" data-chips="top" data-show-autonomy transform="translate(396 302)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="47">Writes the script and scenes into <tspan class="mono">campaign.json</tspan>.</text>
+            <text class="detail" x="22" y="65">Reworks what the Validator or Quality Check sends back.</text>
+          </g>
+          <g data-node="validator" data-chips="top" transform="translate(396 426)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="45">Pre-render gate. Rejects invented numbers, missing assets,</text>
+            <text class="detail" x="22" y="62">bad timing, long text and low contrast.</text>
+            <text class="detail" x="22" y="79">PR 1 open in boiler-room.</text>
+          </g>
+          <g data-node="script-approval" data-chips="top" data-show-autonomy transform="translate(396 550)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="47">Human step: the customer or the founder approves the script.</text>
+            <text class="detail" x="22" y="65">An approval pause holds the run here.</text>
+          </g>
+          <g data-node="art-director" data-chips="top" data-show-autonomy transform="translate(396 674)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="47">Picks scenes from the motion library.</text>
+            <text class="detail" x="22" y="65">Generates any missing assets with Naive.</text>
+          </g>
+          <g data-node="motion-library" data-chips="top" transform="translate(396 798)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="45"><tspan class="mono">packages/motion</tspan>: Remotion scenes, transitions, motion tokens.</text>
+            <text class="detail" x="22" y="62">Based on the Latchkey motion system and open source</text>
+            <text class="detail" x="22" y="79">libraries, both still being assessed.</text>
+          </g>
+          <g data-node="audio" data-chips="top" transform="translate(396 922)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="47">Voice, music, sound effects and word timing, made with</text>
+            <text class="detail" x="22" y="65">ElevenLabs.</text>
+          </g>
+          <g data-node="render-service" data-chips="top" transform="translate(396 1046)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="47">Remotion and FFmpeg.</text>
+            <text class="detail" x="22" y="65">Rendering happens only on export.</text>
+          </g>
+          <g data-node="quality-check" data-chips="top" data-show-autonomy transform="translate(396 1170)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="45">Inspects contact sheets, the frames around every transition,</text>
+            <text class="detail" x="22" y="62">phone-size legibility, brand and claims.</text>
+            <text class="detail" x="22" y="79">Writes a review report.</text>
+          </g>
+          <g data-node="account-manager" data-chips="top" data-show-autonomy transform="translate(396 1294)">
+            <rect class="card" width="440" height="88" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="detail" x="22" y="47">Delivers by a Naive-hosted file link and an email.</text>
+            <text class="detail" x="22" y="65">Handles revisions.</text>
+          </g>
+
+          <!-- Systems the steps use -->
+          <g data-node="naive-generation" data-chips="bottom" transform="translate(24 670)">
+            <rect class="card" width="280" height="96" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46">Image, video and 3D generation.</text>
+          </g>
+          <g data-node="elevenlabs" data-chips="bottom" transform="translate(24 903)">
+            <rect class="card" width="280" height="126" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46"><tspan data-rail="elevenlabs-reserve"></tspan>, reserved for the</text>
+            <text class="detail" x="22" y="63">reference and demo videos only.</text>
+            <text class="detail" x="22" y="80">No backup provider.</text>
+          </g>
+          <g data-node="data-store" data-chips="bottom" transform="translate(928 794)">
+            <rect class="card" width="280" height="96" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46">Nothing chosen yet, so not wired in.</text>
+          </g>
+          <g data-node="render-host" data-chips="bottom" transform="translate(928 1024)">
+            <rect class="card" width="280" height="132" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <rect class="cell" x="22" y="34" width="112" height="24" rx="5"/>
+            <text class="cell-text" x="78" y="51" style="font-size:11.5px">Naive computer</text>
+            <text class="detail" x="141" y="51">or</text>
+            <rect class="cell" x="158" y="34" width="112" height="24" rx="5"/>
+            <text class="cell-text" x="214" y="51" style="font-size:11.5px">Latchkey runners</text>
+            <text class="detail" x="22" y="75">Both proven able to render.</text>
+            <text class="detail" x="22" y="92">Speed test still being finished.</text>
+          </g>
+
+          <!-- Editing -->
+          <g data-node="browser-player" data-chips="bottom" data-show-autonomy transform="translate(24 1042)">
+            <rect class="card" width="280" height="96" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46">Previews edits. Nothing renders.</text>
+          </g>
+          <g data-node="dashboard-editor" data-chips="bottom" data-show-autonomy transform="translate(24 1166)">
+            <rect class="card" width="280" height="96" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46">Edits change <tspan class="mono">campaign.json</tspan>.</text>
+          </g>
+
+          <!-- Email -->
+          <g data-node="agentmail" data-chips="bottom" transform="translate(24 1280)">
+            <rect class="card" width="280" height="116" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="44"><tspan class="mono">boilerroom@agentmail.to</tspan></text>
+            <text class="detail" x="22" y="61">Sender name shows AgentMail:</text>
+            <text class="detail" x="22" y="78">still to change to Boiler Room.</text>
+          </g>
+          <g data-node="reply-webhook" data-chips="bottom" transform="translate(24 1418)">
+            <rect class="card" width="280" height="96" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="46">Replies reach the Account Manager.</text>
+          </g>
+
+          <!-- Output -->
+          <g data-node="exports" data-chips="bottom" transform="translate(396 1418)">
+            <rect class="card" width="812" height="124" rx="8"/>
+            <text class="name" x="22" y="25"></text>
+            <text class="detail" x="22" y="47">One campaign, up to 18 exports.</text>
+            <text class="detail" x="22" y="65">Each format has its own layout</text>
+            <text class="detail" x="22" y="83">rather than a crop.</text>
+
+            <rect class="cell" x="256" y="14" width="92" height="96" rx="6"/>
+            <text class="math-big" x="302" y="62">3</text>
+            <text class="math-word" x="302" y="86">hooks</text>
+            <text class="math-op" x="360" y="68">&#215;</text>
+            <rect class="cell" x="372" y="14" width="172" height="96" rx="6"/>
+            <text class="math-word" x="458" y="32">3 formats</text>
+            <rect class="thumb" x="386" y="50" width="56" height="31.5" rx="1.5"/>
+            <text class="math-word" x="414" y="100">16:9</text>
+            <rect class="thumb" x="456" y="44" width="21" height="37.5" rx="1.5"/>
+            <text class="math-word" x="466.5" y="100">9:16</text>
+            <rect class="thumb" x="494" y="46" width="35.5" height="35.5" rx="1.5"/>
+            <text class="math-word" x="511.75" y="100">1:1</text>
+            <text class="math-op" x="556" y="68">&#215;</text>
+            <rect class="cell" x="568" y="14" width="104" height="96" rx="6"/>
+            <text class="math-big" x="620" y="62">2</text>
+            <text class="math-word" x="620" y="86">calls to action</text>
+            <text class="math-op" x="684" y="68">=</text>
+            <rect class="cell" x="696" y="14" width="104" height="96" rx="6"/>
+            <text class="math-big" x="748" y="62">18</text>
+            <text class="math-word" x="748" y="86">exports at most</text>
+          </g>
+        </svg>
+      </div>
+      <div class="lines-key" style="margin-top:10px">
+        <span><svg width="56" height="12" aria-hidden="true"><path class="flow" d="M2 6 H54"/></svg> Forward flow, labelled with what moves</span>
+        <span><svg width="56" height="12" aria-hidden="true"><path class="loop" d="M2 6 H54"/></svg> Feedback loop, sends work back</span>
+      </div>
+      <figcaption>Both ways in feed one ten-step pipeline. Validator issues go back to the Director before anything is approved. Review failures go back to the Director or the Art Director before anything is delivered. Dashboard edits change <code>campaign.json</code> and preview in the browser; rendering waits for export.</figcaption>
+    </figure>
+  </section>
+
+  <section data-show="company" aria-labelledby="company-heading">
+    <figure>
+      <h2 id="company-heading">Diagram 2: how the company runs itself</h2>
+      <p class="lead">The design: eleven stages form a closed loop. Every tab that crosses the dashed line is a place a person steps in.</p>
+      <div class="diagram-scroll">
+        <svg class="diagram" id="company-svg" viewBox="0 0 1424 848" role="img"
+             aria-label="Eleven company stages form a closed loop around the human boundary. Five tabs cross the boundary where a person steps in: send outreach, handle replies, customer intake, the script approval inside produce the video, and get paid. The founder's three steps are inside the boundary and stay human.">
+
+          <!-- The loop track and the human boundary it runs around -->
+          <rect class="track" x="140" y="88" width="1144" height="672" rx="90"/>
+          <rect class="zone" x="276" y="172" width="872" height="504" rx="14"/>
+
+          <text class="zone-title" x="300" y="206">HUMAN BOUNDARY</text>
+          <text class="zone-note" x="300" y="228">Inside this line a person decides. Outside it the agents run, up to each tab that crosses the line.</text>
+
+          <!-- Stage to stage -->
+          <path class="ring" d="M538 88 H599"/>
+          <path class="ring" d="M824 88 H885"/>
+          <path class="ring" d="M1110 88 H1194 a90 90 0 0 1 90 90 V187"/>
+          <path class="ring" d="M1284 324 V355"/>
+          <path class="ring" d="M1284 492 V523"/>
+          <path class="ring" d="M1284 660 V670 a90 90 0 0 1 -90 90 H1111"/>
+          <path class="ring" d="M886 760 H825"/>
+          <path class="ring" d="M600 760 H539"/>
+          <path class="ring" d="M314 760 H230 a90 90 0 0 1 -90 -90 V661"/>
+          <path class="ring" d="M140 524 V325"/>
+          <path class="ring" d="M140 188 V178 a90 90 0 0 1 90 -90 H313"/>
+
+          <!-- Daily report into the human zone -->
+          <path class="flow" d="M252 270 H328"/>
+
+          <text class="edge-label" x="569" y="80" text-anchor="middle">leads</text>
+          <text class="edge-label" x="855" y="64" text-anchor="middle">worth a</text>
+          <text class="edge-label" x="855" y="80" text-anchor="middle">sample</text>
+          <text class="edge-label" x="1128" y="64">sample and</text>
+          <text class="edge-label" x="1128" y="80">draft email</text>
+          <text class="edge-label" x="1296" y="344">sent email</text>
+          <text class="edge-label" x="1296" y="512">wants a video</text>
+          <text class="edge-label" x="1252" y="782" text-anchor="end">URL</text>
+          <text class="edge-label" x="855" y="736" text-anchor="middle">finished</text>
+          <text class="edge-label" x="855" y="752" text-anchor="middle">video</text>
+          <text class="edge-label" x="569" y="752" text-anchor="middle">delivered</text>
+          <text class="edge-label" x="176" y="782">results</text>
+          <text class="edge-label" x="152" y="428">adjustments</text>
+          <text class="edge-label" x="176" y="74">next cycle</text>
+          <text class="edge-label" x="284" y="260">daily report</text>
+
+          <text class="zone-founder" x="336" y="275">Founder: these three steps stay human</text>
+
+          <!-- The founder's steps -->
+          <g data-node="approve-email" data-chips="top" data-show-autonomy transform="translate(300 290)">
+            <rect class="card" width="692" height="88" rx="8"/>
+            <text class="name" x="22" y="27"></text>
+            <text class="detail" x="22" y="51">Every email in stages 4 and 5, before it goes out.</text>
+          </g>
+          <g data-node="approve-spend" data-chips="top" data-show-autonomy transform="translate(300 392)">
+            <rect class="card" width="692" height="88" rx="8"/>
+            <text class="name" x="22" y="27"></text>
+            <text class="detail" x="22" y="51">Applies at any stage. Caps are in the guard rails below.</text>
+          </g>
+          <g data-node="approve-production" data-chips="top" data-show-autonomy transform="translate(300 494)">
+            <rect class="card" width="692" height="88" rx="8"/>
+            <text class="name" x="22" y="27"></text>
+            <text class="detail" x="22" y="51">Applies at any stage, and to any production deploy.</text>
+          </g>
+
+          <!-- Tabs: drawn before the cards so each one comes out from under its stage -->
+          <g class="tab" data-tab-for="send-outreach" transform="translate(1018 232)">
+            <rect class="tab-box" width="164" height="48" rx="7"/>
+          </g>
+          <g class="tab" data-tab-for="handle-replies" transform="translate(1018 400)">
+            <rect class="tab-box" width="164" height="48" rx="7"/>
+          </g>
+          <g class="tab" data-tab-for="customer-intake" transform="translate(1018 568)">
+            <rect class="tab-box" width="164" height="48" rx="7"/>
+          </g>
+          <g class="tab" data-tab-for="produce-video" transform="translate(910 632)">
+            <rect class="tab-box" width="176" height="70" rx="7"/>
+          </g>
+          <g class="tab" data-tab-for="get-paid" transform="translate(338 632)">
+            <rect class="tab-box" width="176" height="70" rx="7"/>
+          </g>
+
+          <!-- Stages, clockwise from the top left -->
+          <g data-node="find-leads" data-chips="bottom" data-show-autonomy transform="translate(314 20)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Leads feed the same pipeline</text>
+            <text class="detail" x="22" y="82">as customer URLs.</text>
+          </g>
+          <g data-node="qualify" data-chips="bottom" data-show-autonomy transform="translate(600 20)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Decides who is worth a</text>
+            <text class="detail" x="22" y="82">sample.</text>
+          </g>
+          <g data-node="sample-video" data-chips="bottom" data-show-autonomy transform="translate(886 20)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Uses that company's brand,</text>
+            <text class="detail" x="22" y="82">so it goes only to them.</text>
+            <text class="detail" x="22" y="99">Never posted publicly.</text>
+          </g>
+          <g data-node="send-outreach" data-chips="bottom" data-show-autonomy transform="translate(1172 188)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Sends through AgentMail.</text>
+          </g>
+          <g data-node="handle-replies" data-chips="bottom" data-show-autonomy transform="translate(1172 356)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Reads replies by webhook</text>
+            <text class="detail" x="22" y="82">and drafts answers.</text>
+          </g>
+          <g data-node="customer-intake" data-chips="bottom" data-show-autonomy transform="translate(1172 524)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Submits a URL in the</text>
+            <text class="detail" x="22" y="82">dashboard.</text>
+          </g>
+          <g data-node="produce-video" data-chips="bottom" data-show-autonomy transform="translate(886 692)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Diagram 1, end to end.</text>
+          </g>
+          <g data-node="deliver-revise" data-chips="bottom" data-show-autonomy transform="translate(600 692)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">File link and email.</text>
+            <text class="detail" x="22" y="82">Handles revisions.</text>
+          </g>
+          <g data-node="get-paid" data-chips="bottom" data-show-autonomy transform="translate(314 692)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Nothing chosen yet.</text>
+          </g>
+          <g data-node="learn" data-chips="bottom" data-show-autonomy transform="translate(28 524)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Stretch goal. Compares what</text>
+            <text class="detail" x="22" y="82">got replies and which scenes</text>
+            <text class="detail" x="22" y="99">passed review first time.</text>
+          </g>
+          <g data-node="report" data-chips="bottom" data-show-autonomy transform="translate(28 188)">
+            <rect class="card" width="224" height="136" rx="8"/>
+            <text class="name" x="46" y="25"></text>
+            <text class="owner" x="22" y="46"></text>
+            <text class="detail" x="22" y="65">Daily operating report for</text>
+            <text class="detail" x="22" y="82">the founder.</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>The tabs show who steps in and where. Samples use another company's brand, so they go only to that company and are never posted publicly. Stage 7 counts as agent-run, with one customer script approval inside it.</figcaption>
+    </figure>
+  </section>
+
+  <section data-show="company" aria-labelledby="rails-heading">
+    <h2 id="rails-heading">Guard rails</h2>
+    <div class="rails" id="rails"></div>
+  </section>
+</main>
+
+<script>
+/* Update the map here. Change a word, reload, and the diagrams and counts follow.
+   status:   live | building | planned | decide
+   autonomy: agent | approval | customer | human
+   Only mark something live once it is working and verified. */
+const MAP = {
+  lastUpdated: '2026-11-07',
+
+  /* Real results only. All zero until something has actually happened. */
+  counters: { videosDelivered: 0, leadsFound: 0, emailsSent: 0, replies: 0 },
+
+  /* Diagram 1, how Boiler Room works. step is the pipeline order. */
+  technical: [
+    { id: 'naive-account',    name: 'Naive account',           status: 'live',     autonomy: 'agent' },
+    { id: 'naive-team',       name: 'Naive agent team',        status: 'planned',  autonomy: 'agent' },
+    { id: 'dashboard',        name: 'Customer dashboard',      status: 'planned',  autonomy: 'customer' },
+    { id: 'scout',            name: 'Scout agent',             status: 'planned',  autonomy: 'agent' },
+    { id: 'researcher',       name: 'Researcher agent',        status: 'planned',  autonomy: 'agent',    step: 1 },
+    { id: 'director',         name: 'Director agent',          status: 'planned',  autonomy: 'agent',    step: 2 },
+    { id: 'validator',        name: 'Validator',               status: 'building', autonomy: 'agent',    step: 3 },
+    { id: 'script-approval',  name: 'Script approval',         status: 'planned',  autonomy: 'approval', step: 4 },
+    { id: 'art-director',     name: 'Art Director agent',      status: 'planned',  autonomy: 'agent',    step: 5 },
+    { id: 'motion-library',   name: 'Motion library',          status: 'building', autonomy: 'agent',    step: 6 },
+    { id: 'audio',            name: 'Audio',                   status: 'planned',  autonomy: 'agent',    step: 7 },
+    { id: 'render-service',   name: 'Render service',          status: 'planned',  autonomy: 'agent',    step: 8 },
+    { id: 'quality-check',    name: 'Quality Check agent',     status: 'planned',  autonomy: 'agent',    step: 9 },
+    { id: 'account-manager',  name: 'Account Manager agent',   status: 'planned',  autonomy: 'agent',    step: 10 },
+    { id: 'naive-generation', name: 'Naive generation',        status: 'planned',  autonomy: 'agent' },
+    { id: 'elevenlabs',       name: 'ElevenLabs account',      status: 'live',     autonomy: 'agent' },
+    { id: 'render-host',      name: 'Render host',             status: 'decide',   autonomy: 'agent' },
+    { id: 'data-store',       name: 'Data store',              status: 'decide',   autonomy: 'agent' },
+    { id: 'dashboard-editor', name: 'Dashboard editor',        status: 'planned',  autonomy: 'customer' },
+    { id: 'browser-player',   name: 'Remotion browser player', status: 'planned',  autonomy: 'customer' },
+    { id: 'agentmail',        name: 'AgentMail inbox',         status: 'live',     autonomy: 'agent' },
+    { id: 'reply-webhook',    name: 'Reply webhook',           status: 'planned',  autonomy: 'agent' },
+    { id: 'exports',          name: 'Exports',                 status: 'planned',  autonomy: 'agent' },
+  ],
+
+  /* Diagram 2, how the company runs itself. stage is the loop order; the three
+     entries without a stage are the founder's steps inside the human boundary.
+     person is the tab text where a person steps in. Leave it out and the tab goes. */
+  company: [
+    { id: 'find-leads',      stage: 1,  name: 'Find leads',          owner: 'Scout',           status: 'planned', autonomy: 'agent' },
+    { id: 'qualify',         stage: 2,  name: 'Qualify',             owner: 'Scout',           status: 'planned', autonomy: 'agent' },
+    { id: 'sample-video',    stage: 3,  name: 'Make a sample video', owner: 'Production crew', status: 'planned', autonomy: 'agent' },
+    { id: 'send-outreach',   stage: 4,  name: 'Send outreach',       owner: 'Account Manager', status: 'planned', autonomy: 'approval', person: 'Founder approves every email' },
+    { id: 'handle-replies',  stage: 5,  name: 'Handle replies',      owner: 'Account Manager', status: 'planned', autonomy: 'approval', person: 'Founder approves every answer' },
+    { id: 'customer-intake', stage: 6,  name: 'Customer intake',     owner: 'Customer',        status: 'planned', autonomy: 'customer', person: 'Customer submits a URL' },
+    { id: 'produce-video',   stage: 7,  name: 'Produce the video',   owner: 'Full pipeline',   status: 'planned', autonomy: 'agent',    person: 'Customer approves the script' },
+    { id: 'deliver-revise',  stage: 8,  name: 'Deliver and revise',  owner: 'Account Manager', status: 'planned', autonomy: 'agent' },
+    { id: 'get-paid',        stage: 9,  name: 'Get paid',            owner: 'A person',        status: 'decide',  autonomy: 'human',    person: 'A person does this' },
+    { id: 'learn',           stage: 10, name: 'Learn',               owner: 'Not assigned yet', status: 'planned', autonomy: 'agent' },
+    { id: 'report',          stage: 11, name: 'Report',              owner: 'Coordinator',     status: 'planned', autonomy: 'agent' },
+    { id: 'approve-email',      name: 'Approve outbound email',                   status: 'planned', autonomy: 'human' },
+    { id: 'approve-spend',      name: 'Decide spending above caps',               status: 'planned', autonomy: 'human' },
+    { id: 'approve-production', name: 'Promote to main and deploy to production', status: 'planned', autonomy: 'human' },
+  ],
+
+  /* Guard rails. status null means a limit or a balance, not something being built. */
+  guardRails: [
+    { id: 'agent-budgets',      name: 'Naive agent budgets',     value: '',                                detail: 'Budgets on each agent.', status: 'planned' },
+    { id: 'media-cap',          name: 'Per-run media spend cap', value: '',                                detail: 'Separate cap, because agent budgets do not cap media jobs.', status: 'planned' },
+    { id: 'claims-gate',        name: 'Claims gate',             value: '',                                detail: 'The Validator rejects invented numbers before anything renders.', status: 'building' },
+    { id: 'audit-logs',         name: 'Naive audit logs',        value: '',                                detail: 'A record of what the agents did.', status: 'planned' },
+    { id: 'elevenlabs-reserve', name: 'ElevenLabs reserve',      value: '3,531 credits',                   detail: 'Reserved for the videos that matter: the reference and demo videos only. No backup provider.', status: 'planned' },
+    { id: 'naive-balance',      name: 'Naive balance',           value: '250.91 USD',                      detail: 'As of 2026-11-07.', status: null },
+    { id: 'agentmail-plan',     name: 'AgentMail free plan',     value: '3,000 emails a month, 3 inboxes', detail: 'Plan limit.', status: null },
+  ],
+};
+
+const STATUS = {
+  live: 'working and verified',
+  building: 'work in progress',
+  planned: 'agreed but not started',
+  decide: 'a decision is still open',
+};
+const AUTONOMY = {
+  agent: 'runs with no human',
+  approval: 'agent does the work, a human approves',
+  customer: 'the customer acts',
+  human: 'a person does it',
+};
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const everyNode = [...MAP.technical, ...MAP.company];
+const nodeById = new Map(everyNode.map(item => [item.id, item]));
+const stages = MAP.company.filter(item => item.stage);
+
+function svgEl(tag, attrs, parent) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+  if (parent) parent.append(el);
+  return el;
+}
+
+const GLYPHS = {
+  live: g => svgEl('circle', { class: 'glyph-fill', r: 3.5 }, g),
+  building: g => {
+    svgEl('circle', { class: 'glyph-line', r: 3.5 }, g);
+    svgEl('path', { class: 'glyph-fill', d: 'M0 -3.5 A3.5 3.5 0 0 1 0 3.5 z' }, g);
+  },
+  planned: g => svgEl('circle', { class: 'glyph-line', r: 3.5 }, g),
+  decide: g => svgEl('path', { class: 'glyph-fill', d: 'M0 -4.5 L4.5 0 L0 4.5 L-4.5 0 z' }, g),
+  agent: g => svgEl('rect', { class: 'glyph-fill', x: -3, y: -3, width: 6, height: 6 }, g),
+  approval: g => svgEl('path', { class: 'glyph-line', d: 'M-3.5 0.2 L-1 2.8 L3.8 -3' }, g),
+  customer: g => {
+    svgEl('circle', { class: 'glyph-line', cy: -2.3, r: 2 }, g);
+    svgEl('path', { class: 'glyph-line', d: 'M-3.8 4.5 C-3.8 0.5 3.8 0.5 3.8 4.5' }, g);
+  },
+  human: g => drawPerson(g),
+};
+
+function drawPerson(g) {
+  svgEl('circle', { class: 'glyph-fill', cy: -2.6, r: 2.4 }, g);
+  svgEl('path', { class: 'glyph-fill', d: 'M-4.2 5 C-4.2 -0.2 4.2 -0.2 4.2 5 z' }, g);
+}
+
+/* Draws a label chip. It always carries a word and a shape, never colour alone. */
+function drawChip(parent, x, y, value, alignRight) {
+  const chip = svgEl('g', { class: 'chip', 'data-value': value }, parent);
+  const bg = svgEl('rect', { class: 'chip-bg', height: 19, rx: 9.5 }, chip);
+  const glyph = svgEl('g', { transform: 'translate(11.5 9.5)' }, chip);
+  if (GLYPHS[value]) GLYPHS[value](glyph);
+  const label = svgEl('text', { class: 'chip-text', x: 20, y: 13.4 }, chip);
+  label.textContent = value.toUpperCase();
+  const width = Math.ceil(label.getComputedTextLength()) + 29;
+  bg.setAttribute('width', width);
+  chip.setAttribute('transform', `translate(${alignRight ? x - width : x} ${y})`);
+  return width;
+}
+
+function standaloneChip(host, value) {
+  const svg = svgEl('svg', { height: 21, 'aria-hidden': 'true' });
+  host.prepend(svg);
+  const width = drawChip(svg, 1, 1, value, false);
+  svg.setAttribute('width', width + 2);
+}
+
+function decorateNode(node, item) {
+  node.dataset.status = item.status;
+  node.dataset.autonomy = item.autonomy;
+
+  const card = node.querySelector('.card');
+  const width = Number(card.getAttribute('width'));
+  const height = Number(card.getAttribute('height'));
+  const stripe = svgEl('rect', { class: 'stripe', x: 2, y: 8, width: 10, height: height - 16, rx: 3 });
+  card.after(stripe);
+
+  node.querySelector('.name').textContent = item.name;
+  const owner = node.querySelector('.owner');
+  if (owner) owner.textContent = `Owner: ${item.owner}`;
+
+  const number = item.step ?? item.stage;
+  if (number) {
+    svgEl('circle', { cx: 32, cy: 20, r: 10, fill: 'var(--ink)' }, node);
+    const digit = svgEl('text', { x: 32, y: 24, 'text-anchor': 'middle', fill: 'var(--surface)', style: 'font: 700 11px var(--font-sans)' }, node);
+    digit.textContent = number;
+  }
+
+  const showAutonomy = 'showAutonomy' in node.dataset;
+  if (node.dataset.chips === 'top') {
+    const statusWidth = drawChip(node, width - 10, 9, item.status, true);
+    if (showAutonomy) drawChip(node, width - 10 - statusWidth - 6, 9, item.autonomy, true);
+  } else {
+    const statusWidth = drawChip(node, 22, height - 28, item.status, false);
+    if (showAutonomy) drawChip(node, 22 + statusWidth + 6, height - 28, item.autonomy, false);
+  }
+
+  const tooltip = svgEl('title', {}, node);
+  tooltip.textContent = `${item.name}: ${item.status}, ${item.autonomy}`;
+}
+
+/* Splits tab text into two lines at the space nearest the middle. */
+function twoLines(text) {
+  const words = text.split(' ');
+  let best = 1;
+  let bestGap = Infinity;
+  for (let i = 1; i < words.length; i++) {
+    const gap = Math.abs(words.slice(0, i).join(' ').length - words.slice(i).join(' ').length);
+    if (gap < bestGap) { best = i; bestGap = gap; }
+  }
+  return [words.slice(0, best).join(' '), words.slice(best).join(' ')];
+}
+
+function drawTab(tab) {
+  const item = nodeById.get(tab.dataset.tabFor);
+  if (!item || !item.person) { tab.style.display = 'none'; return; }
+  const person = svgEl('g', { transform: 'translate(18 24)' }, tab);
+  drawPerson(person);
+  twoLines(item.person).forEach((line, index) => {
+    const text = svgEl('text', { class: 'tab-text', x: 32, y: 21 + index * 15 }, tab);
+    text.textContent = line;
+  });
+  svgEl('title', {}, tab).textContent = item.person;
+}
+
+function setText(id, text) {
+  document.getElementById(id).textContent = text;
+}
+
+function renderKey() {
+  const tally = (list, key, value) => list.filter(item => item[key] === value).length;
+  const statusList = document.getElementById('key-status');
+  for (const [value, meaning] of Object.entries(STATUS)) {
+    const row = document.createElement('li');
+    row.innerHTML = `<span>${meaning}. <b>${tally(everyNode, 'status', value)} of ${everyNode.length} parts</b></span>`;
+    statusList.append(row);
+    standaloneChip(row, value);
+  }
+  const autonomyList = document.getElementById('key-autonomy');
+  for (const [value, meaning] of Object.entries(AUTONOMY)) {
+    const row = document.createElement('li');
+    row.innerHTML = `<span>${meaning}. <b>${tally(stages, 'autonomy', value)} of ${stages.length} stages</b></span>`;
+    autonomyList.append(row);
+    const stripe = svgEl('svg', { width: 12, height: 20, 'aria-hidden': 'true', 'data-autonomy': value });
+    svgEl('rect', { class: 'stripe', width: 12, height: 20, rx: 3 }, stripe);
+    row.prepend(stripe);
+    standaloneChip(row, value);
+  }
+}
+
+function renderScoreboard() {
+  const total = stages.length;
+  const agentRun = stages.filter(stage => stage.autonomy === 'agent').length;
+  const liveToday = stages.filter(stage => stage.status === 'live').length;
+  setText('tally-agent', `Agent-run stages: ${agentRun} of ${total}`);
+  setText('tally-live', `Stages live today: ${liveToday} of ${total}`);
+
+  setText('count-videos', MAP.counters.videosDelivered);
+  setText('count-leads', MAP.counters.leadsFound);
+  setText('count-emails', MAP.counters.emailsSent);
+  setText('count-replies', MAP.counters.replies);
+
+  setText('decisions-today', liveToday === 0 ? `None yet: ${liveToday} of ${total} stages are live.` : `${liveToday} of ${total} stages are live.`);
+  const open = everyNode.filter(item => item.status === 'decide');
+  setText('open-count', `Still open for the founder (${open.length}):`);
+  setText('open-list', open.map(item => item.name).join(', ') + '.');
+
+  setText('stepins-today', liveToday === 0 ? 'No stage runs yet, so there are no step-ins to report.' : `${liveToday} of ${total} stages are live.`);
+  const withPerson = stages.filter(stage => stage.person);
+  setText('stepins-design', `By design, a person steps in at ${withPerson.length} of ${total} stages:`);
+  const list = document.getElementById('stepins-list');
+  for (const stage of withPerson) {
+    const row = document.createElement('li');
+    row.textContent = `${stage.stage}. ${stage.name}: ${stage.person}`;
+    list.append(row);
+  }
+  const founderOnly = document.createElement('li');
+  founderOnly.textContent = 'Any stage: spending above caps, main and production stay with the founder';
+  list.append(founderOnly);
+}
+
+function renderGuardRails() {
+  const host = document.getElementById('rails');
+  for (const rail of MAP.guardRails) {
+    const box = document.createElement('article');
+    box.className = 'rail';
+    host.append(box);
+    const head = document.createElement('div');
+    head.className = 'rail-head';
+    const name = document.createElement('h3');
+    name.textContent = rail.name;
+    head.append(name);
+    box.append(head);
+    if (rail.status) {
+      const holder = document.createElement('span');
+      head.append(holder);
+      standaloneChip(holder, rail.status);
+    } else {
+      const limit = document.createElement('span');
+      limit.className = 'rail-limit';
+      limit.textContent = 'LIMIT';
+      head.append(limit);
+    }
+    if (rail.value) {
+      const value = document.createElement('div');
+      value.className = 'rail-value';
+      value.textContent = rail.value;
+      box.append(value);
+    }
+    const detail = document.createElement('p');
+    detail.textContent = rail.detail;
+    box.append(detail);
+  }
+}
+
+/* The data and the drawings must list the same nodes. Anything out of step shows at the top of the page. */
+function checkMap() {
+  const problems = [];
+  const drawn = new Set([...document.querySelectorAll('[data-node]')].map(node => node.dataset.node));
+  for (const item of everyNode) {
+    if (!drawn.has(item.id)) problems.push(`${item.id} is in the data but not drawn`);
+    if (!(item.status in STATUS)) problems.push(`${item.id} has an unknown status: ${item.status}`);
+    if (!(item.autonomy in AUTONOMY)) problems.push(`${item.id} has an unknown autonomy: ${item.autonomy}`);
+  }
+  for (const id of drawn) {
+    if (!nodeById.has(id)) problems.push(`${id} is drawn but not in the data`);
+  }
+  for (const tab of document.querySelectorAll('[data-tab-for]')) {
+    if (!nodeById.has(tab.dataset.tabFor)) problems.push(`tab ${tab.dataset.tabFor} has no stage in the data`);
+  }
+  for (const stage of stages) {
+    if (stage.person && !document.querySelector(`[data-tab-for="${stage.id}"]`)) {
+      problems.push(`${stage.id} has a person step but no tab is drawn for it`);
+    }
+  }
+  for (const rail of MAP.guardRails) {
+    if (rail.status !== null && !(rail.status in STATUS)) problems.push(`${rail.id} has an unknown status: ${rail.status}`);
+  }
+  if (problems.length) {
+    const box = document.getElementById('map-problems');
+    box.textContent = `The map is out of step: ${problems.join('; ')}.`;
+    box.hidden = false;
+    problems.forEach(problem => console.error(problem));
+  }
+}
+
+function setUpThemeToggle() {
+  const root = document.documentElement;
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const dark = root.dataset.theme
+      ? root.dataset.theme === 'dark'
+      : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+  });
+}
+
+setText('last-updated', MAP.lastUpdated);
+checkMap();
+document.querySelectorAll('[data-node]').forEach(node => {
+  const item = nodeById.get(node.dataset.node);
+  if (item) decorateNode(node, item);
+});
+document.querySelectorAll('[data-tab-for]').forEach(drawTab);
+document.querySelectorAll('[data-rail]').forEach(span => {
+  span.textContent = MAP.guardRails.find(rail => rail.id === span.dataset.rail)?.value ?? '';
+});
+renderKey();
+renderScoreboard();
+renderGuardRails();
+setUpThemeToggle();
+</script>
+</body>
+</html>
