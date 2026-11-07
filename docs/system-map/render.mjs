@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Regenerates technical.png and autonomy.png from index.html at 2x scale.
+// Regenerates technical.png, autonomy.png and scoreboard.png from index.html at 2x scale.
 // Usage: PLAYWRIGHT_DIR=/path/to/folder/with/playwright node docs/system-map/render.mjs
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
@@ -20,6 +20,8 @@ try {
 const shots = [
   { file: 'technical.png', view: 'technical', width: 1336 },
   { file: 'autonomy.png', view: 'company', width: 1496 },
+  // Stays readable inline on GitHub. Wider than the page's 900px breakpoint, to keep the columns.
+  { file: 'scoreboard.png', view: 'scoreboard', width: 920 },
 ];
 
 const browser = await chromium.launch();

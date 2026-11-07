@@ -30,7 +30,7 @@
     /* Autonomy set */
     --auto-agent: #4a5478;
     --auto-approval: #6b3db0;
-    --auto-customer: #0d7687;
+    --auto-customer: #0b6e7e;
     --auto-human: #b0244e;
   }
   @media (prefers-color-scheme: dark) {
@@ -116,14 +116,23 @@
   .key li { display: flex; align-items: center; gap: 10px; color: var(--ink-2); font-size: 14px; }
   .key li svg { flex: none; display: block; }
   .key li b { color: var(--ink); font-weight: 600; }
+  .key-note { color: var(--ink-2); font-size: 13px; margin-top: 8px; }
   .lines-key { display: flex; flex-wrap: wrap; gap: 8px 28px; color: var(--ink-2); font-size: 14px; }
   .lines-key span { display: inline-flex; align-items: center; gap: 8px; }
+
+  /* Right now: the first thing to read, in both views */
+  .now-lists { display: grid; grid-template-columns: 1fr 1fr 2fr 1fr; gap: 12px 24px; margin-top: 10px; }
+  .now-head { display: flex; align-items: center; gap: 8px; min-height: 21px; margin-bottom: 6px; }
+  .now-head svg { flex: none; display: block; }
+  .now-lists ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: 14px; }
 
   /* Scoreboard */
   .tallies { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
   .tally { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 10px; padding: 14px 18px; }
   .tally-value { font-size: 26px; font-weight: 700; line-height: 1.2; }
   .tally-note { color: var(--ink-2); }
+  /* The design target stays quieter than the live count. */
+  .tally-design .tally-value { font-size: 21px; font-weight: 600; color: var(--ink-2); }
   .questions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
   .question { display: grid; gap: 10px; align-content: start; }
   .question ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 14px; }
@@ -145,10 +154,10 @@
   #company-svg { max-width: 1424px; }
 
   .card { fill: var(--surface); stroke: var(--status-planned); }
-  .stripe { fill: var(--auto-agent); }
   .name { font: 600 14.5px var(--font-sans); fill: var(--ink); }
   .owner { font: 600 12.5px var(--font-sans); fill: var(--ink); }
   .detail { font: 400 12.5px var(--font-sans); fill: var(--ink-2); }
+  .open-note { font: 600 12.5px var(--font-sans); fill: var(--ink); }
   .detail .mono, .edge-label .mono { font-family: var(--font-mono); font-size: 11.5px; }
   .edge-label { font: 500 12px var(--font-sans); fill: var(--ink-2); }
   .lane { font: 700 11px var(--font-sans); letter-spacing: .08em; fill: var(--ink-2); }
@@ -170,17 +179,23 @@
   .arrow-open { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .loop-title { font: 700 12.5px var(--font-sans); fill: var(--ink); }
 
-  /* Status drives the border. Dotted means not built yet; only live gets a solid outline. */
+  /* Status drives the border and the fill. Dotted means not built yet. Only live gets a solid
+     outline and a solid card. Other cards take the diagram background rather than being
+     transparent, because the loop track and the tabs run underneath them. */
   [data-status="live"] > .card { stroke: var(--status-live); stroke-width: 2.5; }
-  [data-status="building"] > .card { stroke: var(--status-building); stroke-width: 2.25; stroke-dasharray: 9 5; }
-  [data-status="planned"] > .card { stroke: var(--status-planned); stroke-width: 1.75; stroke-dasharray: .5 5; stroke-linecap: round; }
-  [data-status="decide"] > .card { stroke: var(--status-decide); stroke-width: 2.5; stroke-dasharray: 14 4 3 4; }
+  [data-status="building"] > .card { fill: color-mix(in srgb, var(--surface) 50%, var(--surface-2)); stroke: var(--status-building); stroke-width: 2.25; stroke-dasharray: 9 5; }
+  [data-status="planned"] > .card { fill: var(--surface-2); stroke: var(--status-planned); stroke-width: 1.75; stroke-dasharray: .5 5; stroke-linecap: round; }
+  [data-status="decide"] > .card { fill: var(--surface-2); stroke: var(--status-decide); stroke-width: 2.5; stroke-dasharray: 14 4 3 4; }
 
-  /* Autonomy drives the left stripe: solid, hatched, dotted or crossed. */
+  /* Autonomy drives the left stripe: solid, hatched, dotted or crossed. It is the design, not
+     the truth, so it stays faint until the part is live. No level means no stripe. */
   [data-autonomy="agent"] > .stripe { fill: var(--auto-agent); }
   [data-autonomy="approval"] > .stripe { fill: url(#pattern-approval); }
   [data-autonomy="customer"] > .stripe { fill: url(#pattern-customer); }
   [data-autonomy="human"] > .stripe { fill: url(#pattern-human); }
+  [data-status="planned"] > .stripe, [data-status="decide"] > .stripe { opacity: .4; }
+  /* Patterns carry less ink than the solid stripe, so they need more opacity to stay readable. */
+  :is([data-status="planned"], [data-status="decide"]):is([data-autonomy="approval"], [data-autonomy="customer"], [data-autonomy="human"]) > .stripe { opacity: .65; }
   .pat-approval { stroke: var(--auto-approval); stroke-width: 2.5; }
   .pat-customer { fill: var(--auto-customer); }
   .pat-human { stroke: var(--auto-human); stroke-width: 1.75; }
@@ -192,7 +207,7 @@
   .chip[data-value="live"] .chip-bg { fill: var(--status-live); stroke: var(--status-live); }
   .chip[data-value="building"] { color: var(--status-building); }
   .chip[data-value="building"] .chip-bg { fill: var(--surface); stroke: var(--status-building); stroke-dasharray: 4 2; }
-  .chip[data-value="planned"] { color: var(--status-planned); }
+  .chip[data-value="planned"] { color: var(--ink-2); }
   .chip[data-value="planned"] .chip-bg { fill: var(--surface); stroke: var(--status-planned); }
   .chip[data-value="decide"] { color: var(--on-fill); }
   .chip[data-value="decide"] .chip-bg { fill: var(--status-decide); stroke: var(--status-decide); }
@@ -204,17 +219,23 @@
   .chip[data-value="customer"] .chip-bg { fill: var(--surface); stroke: var(--auto-customer); }
   .chip[data-value="human"] { color: var(--on-fill); }
   .chip[data-value="human"] .chip-bg { fill: var(--auto-human); stroke: var(--auto-human); }
+  /* Away from a live part the autonomy chip loses its pill, so the status chip outweighs it. */
+  .chip[data-quiet] .chip-bg { fill: none; stroke: none; }
+  .chip[data-quiet] .chip-text { font-weight: 600; }
+  .chip[data-quiet][data-value="human"] { color: var(--auto-human); }
   .glyph-fill { fill: currentColor; }
   .glyph-line { fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
   /* Diagram 2: the human boundary */
-  .zone { fill: var(--surface); stroke: var(--auto-human); stroke-width: 2.5; stroke-dasharray: 12 6; }
+  .zone { fill: none; stroke: var(--auto-human); stroke-width: 2.5; stroke-dasharray: 12 6; }
   .zone-title { font: 700 14px var(--font-sans); letter-spacing: .08em; fill: var(--auto-human); }
   .zone-note { font: 400 13px var(--font-sans); fill: var(--ink-2); }
   .zone-founder { font: 700 13px var(--font-sans); fill: var(--ink); }
-  .tab-box { fill: var(--surface); stroke: var(--auto-human); stroke-width: 2; }
+  .tab { color: var(--auto-human); }
+  .tab[data-who="customer"] { color: var(--auto-customer); }
+  .tab-box { fill: var(--surface-2); stroke: currentColor; stroke-width: 2; }
+  .tab-link { fill: none; stroke: currentColor; stroke-width: 2; }
   .tab-text { font: 700 12px var(--font-sans); fill: var(--ink); }
-  .tab .glyph-fill { fill: var(--auto-human); }
 
   /* Guard rails */
   .rails { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-top: 12px; }
@@ -225,14 +246,16 @@
   .rail p { color: var(--ink-2); font-size: 14px; }
   .rail-limit { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--ink-2); }
 
-  /* render.mjs sets data-view to capture one diagram at a time */
+  /* render.mjs sets data-view to capture one image at a time */
   :root[data-view="technical"] [data-show="company"],
   :root[data-view="company"] [data-show="technical"],
+  :root[data-view="scoreboard"] [data-show="technical"],
+  :root[data-view="scoreboard"] [data-detail],
   :root[data-view] .theme-toggle { display: none; }
 
   @media (max-width: 900px) {
     body { padding: 16px; }
-    .key, .tallies, .questions { grid-template-columns: minmax(0, 1fr); }
+    .key, .tallies, .questions, .now-lists { grid-template-columns: minmax(0, 1fr); }
     .tally-value { font-size: 21px; }
   }
 </style>
@@ -278,30 +301,29 @@
 
   <p class="problems" id="map-problems" role="alert" hidden></p>
 
-  <section class="panel key" aria-label="Key">
-    <div>
-      <h3>Status: how far along it is</h3>
-      <ul id="key-status"></ul>
-    </div>
-    <div>
-      <h3>Autonomy: who does the work</h3>
-      <ul id="key-autonomy"></ul>
+  <section class="panel" aria-labelledby="now-heading">
+    <h2 id="now-heading">Right now</h2>
+    <div class="now-lists">
+      <div><h3 class="now-head" id="now-head-live" aria-label="Live"></h3><ul id="now-live"></ul></div>
+      <div><h3 class="now-head" id="now-head-building" aria-label="Building"></h3><ul id="now-building"></ul></div>
+      <div><h3 class="now-head" id="now-head-needs">Needs you</h3><ul id="now-needs"></ul></div>
+      <div><h3 class="now-head">Next</h3><ul id="now-next"></ul></div>
     </div>
   </section>
 
-  <section data-show="company" aria-labelledby="score-heading">
+  <section aria-labelledby="score-heading">
     <h2 id="score-heading">Scoreboard</h2>
     <div class="tallies">
-      <div class="tally">
-        <div class="tally-value" id="tally-agent"></div>
-        <div class="tally-note">Design target, not what runs today.</div>
-      </div>
       <div class="tally">
         <div class="tally-value" id="tally-live"></div>
         <div class="tally-note">What actually runs on its own right now.</div>
       </div>
+      <div class="tally tally-design">
+        <div class="tally-value" id="tally-agent"></div>
+        <div class="tally-note" id="tally-agent-note"></div>
+      </div>
     </div>
-    <div class="questions">
+    <div class="questions" data-show="company">
       <article class="panel question">
         <h3>What did the agents deliver?</h3>
         <dl class="counters">
@@ -314,21 +336,34 @@
       <article class="panel question">
         <h3>What decisions did they make?</h3>
         <p><b id="decisions-today"></b></p>
-        <p>Built to decide, once running:</p>
+        <p>Designed to decide, once built:</p>
         <ul>
           <li>Scout: who is worth a sample</li>
           <li>Validator: pass or reject a script</li>
           <li>Art Director: which scenes to use</li>
           <li>Quality Check: pass or send back</li>
         </ul>
-        <p><b id="open-count"></b> <span id="open-list"></span></p>
       </article>
       <article class="panel question">
         <h3>Where did you need to step in?</h3>
         <p><b id="stepins-today"></b></p>
         <p id="stepins-design"></p>
         <ul id="stepins-list"></ul>
+        <p id="stepins-open" hidden></p>
       </article>
+    </div>
+  </section>
+
+  <section class="panel key" aria-label="Key">
+    <div>
+      <h3>Status: how far along it is</h3>
+      <ul id="key-status"></ul>
+      <p class="key-note">Only live parts are drawn solid.</p>
+    </div>
+    <div>
+      <h3>Autonomy: who is designed to do the work</h3>
+      <ul id="key-autonomy"></ul>
+      <p class="key-note">Counts cover the eleven stages in Diagram 2. No stripe means no level: accounts, infrastructure, undecided parts and outputs have none.</p>
     </div>
   </section>
 
@@ -338,7 +373,7 @@
       <p class="lead">The design: a customer URL or a Scout lead goes through ten steps and comes out as finished video files.</p>
       <div class="diagram-scroll">
         <svg class="diagram" id="technical-svg" viewBox="0 0 1264 1560" role="img"
-             aria-label="Both ways in feed one ten-step pipeline. Dashed heavy arrows are the two feedback loops: Validator issues go back to the Director, and review failures go back to the Director or the Art Director.">
+             aria-label="Both ways in feed one ten-step pipeline. Dashed heavy arrows are the two feedback loops: Validator issues go back to the Director, and review failures go back to the Director or the Art Director. Whether an exported edit passes the Validator first is still open.">
 
           <!-- Lane labels -->
           <text class="lane" x="24" y="20">CONTROL LAYER</text>
@@ -396,13 +431,19 @@
           <text class="edge-label" x="628" y="1404">delivers up to 18 exports</text>
           <text class="edge-label" x="350" y="710" text-anchor="middle">new assets</text>
           <text class="edge-label" x="350" y="958" text-anchor="middle">audio, timing</text>
-          <text class="edge-label" x="350" y="1082" text-anchor="middle">export only</text>
+          <text class="edge-label" x="350" y="1072" text-anchor="middle">export only</text>
           <text class="edge-label" x="882" y="1082" text-anchor="middle">runs on</text>
           <text class="edge-label" x="176" y="1157">edits <tspan class="mono">campaign.json</tspan></text>
           <text class="edge-label" x="350" y="1300" text-anchor="middle">email with</text>
           <text class="edge-label" x="350" y="1316" text-anchor="middle">file link</text>
           <text class="edge-label" x="176" y="1410">replies by webhook</text>
           <text class="edge-label" x="312" y="1484">replies</text>
+
+          <!-- Open question sitting on the export arrow. Its chip is drawn from MAP.questions. -->
+          <g data-question="export-recheck" transform="translate(309 1080.5)">
+            <text class="edge-label" x="41" y="33" text-anchor="middle">Validator</text>
+            <text class="edge-label" x="41" y="48" text-anchor="middle">first?</text>
+          </g>
 
           <text class="loop-title" x="892" y="408">Feedback loop 1: validator issues</text>
           <text class="detail" x="892" y="426">Back to the Director with a fix message</text>
@@ -596,24 +637,24 @@
         <span><svg width="56" height="12" aria-hidden="true"><path class="flow" d="M2 6 H54"/></svg> Forward flow, labelled with what moves</span>
         <span><svg width="56" height="12" aria-hidden="true"><path class="loop" d="M2 6 H54"/></svg> Feedback loop, sends work back</span>
       </div>
-      <figcaption>Both ways in feed one ten-step pipeline. Validator issues go back to the Director before anything is approved. Review failures go back to the Director or the Art Director before anything is delivered. Dashboard edits change <code>campaign.json</code> and preview in the browser; rendering waits for export.</figcaption>
+      <figcaption>Both ways in feed one ten-step pipeline. Validator issues go back to the Director before anything is approved. Review failures go back to the Director or the Art Director before anything is delivered. Dashboard edits change <code>campaign.json</code> and preview in the browser; rendering waits for export. Whether an export passes the Validator first is still open.</figcaption>
     </figure>
   </section>
 
-  <section data-show="company" aria-labelledby="company-heading">
+  <section data-show="company" data-detail aria-labelledby="company-heading">
     <figure>
       <h2 id="company-heading">Diagram 2: how the company runs itself</h2>
-      <p class="lead">The design: eleven stages form a closed loop. Every tab that crosses the dashed line is a place a person steps in.</p>
+      <p class="lead">The design: eleven stages form a closed loop. Each tab marks a stage where a person acts: the founder, another person or a customer.</p>
       <div class="diagram-scroll">
         <svg class="diagram" id="company-svg" viewBox="0 0 1424 848" role="img"
-             aria-label="Eleven company stages form a closed loop around the human boundary. Five tabs cross the boundary where a person steps in: send outreach, handle replies, customer intake, the script approval inside produce the video, and get paid. The founder's three steps are inside the boundary and stay human.">
+             aria-label="Eleven company stages form a closed loop around the human boundary. Five tabs mark where a person acts: the founder at send outreach and handle replies, a customer at customer intake and at the script approval inside produce the video, and a person at get paid. The founder's three steps are inside the boundary and stay human.">
 
           <!-- The loop track and the human boundary it runs around -->
           <rect class="track" x="140" y="88" width="1144" height="672" rx="90"/>
           <rect class="zone" x="276" y="172" width="872" height="504" rx="14"/>
 
           <text class="zone-title" x="300" y="206">HUMAN BOUNDARY</text>
-          <text class="zone-note" x="300" y="228">Inside this line a person decides. Outside it the agents run, up to each tab that crosses the line.</text>
+          <text class="zone-note" x="300" y="228">Inside this line the founder decides. Each tab marks a stage where a person acts; the stage's own label shows who does the rest.</text>
 
           <!-- Stage to stage -->
           <path class="ring" d="M538 88 H599"/>
@@ -651,26 +692,29 @@
 
           <!-- The founder's steps -->
           <g data-node="approve-email" data-chips="top" data-show-autonomy transform="translate(300 290)">
-            <rect class="card" width="692" height="88" rx="8"/>
+            <rect class="card" width="692" height="158" rx="8"/>
             <text class="name" x="22" y="27"></text>
-            <text class="detail" x="22" y="51">Every email in stages 4 and 5, before it goes out.</text>
+            <text class="detail" x="22" y="51">Approves outbound email before it goes out.</text>
+            <text class="open-note" data-question="delivery-email" x="22" y="75">Still open: does the stage 8 delivery email need this too?</text>
           </g>
-          <g data-node="approve-spend" data-chips="top" data-show-autonomy transform="translate(300 392)">
-            <rect class="card" width="692" height="88" rx="8"/>
+          <g data-node="approve-spend" data-chips="top" data-show-autonomy transform="translate(300 462)">
+            <rect class="card" width="580" height="70" rx="8"/>
             <text class="name" x="22" y="27"></text>
             <text class="detail" x="22" y="51">Applies at any stage. Caps are in the guard rails below.</text>
           </g>
-          <g data-node="approve-production" data-chips="top" data-show-autonomy transform="translate(300 494)">
-            <rect class="card" width="692" height="88" rx="8"/>
+          <g data-node="approve-production" data-chips="top" data-show-autonomy transform="translate(300 544)">
+            <rect class="card" width="580" height="70" rx="8"/>
             <text class="name" x="22" y="27"></text>
             <text class="detail" x="22" y="51">Applies at any stage, and to any production deploy.</text>
           </g>
 
           <!-- Tabs: drawn before the cards so each one comes out from under its stage -->
-          <g class="tab" data-tab-for="send-outreach" transform="translate(1018 232)">
+          <g class="tab" data-tab-for="send-outreach" transform="translate(1018 272)">
+            <path class="tab-link" d="M0 24 H-26"/>
             <rect class="tab-box" width="164" height="48" rx="7"/>
           </g>
           <g class="tab" data-tab-for="handle-replies" transform="translate(1018 400)">
+            <path class="tab-link" d="M0 24 H-26"/>
             <rect class="tab-box" width="164" height="48" rx="7"/>
           </g>
           <g class="tab" data-tab-for="customer-intake" transform="translate(1018 568)">
@@ -702,9 +746,9 @@
             <rect class="card" width="224" height="136" rx="8"/>
             <text class="name" x="46" y="25"></text>
             <text class="owner" x="22" y="46"></text>
-            <text class="detail" x="22" y="65">Uses that company's brand,</text>
-            <text class="detail" x="22" y="82">so it goes only to them.</text>
-            <text class="detail" x="22" y="99">Never posted publicly.</text>
+            <text class="detail" x="22" y="65">Goes only to that company.</text>
+            <text class="detail" x="22" y="82">Never posted publicly.</text>
+            <text class="open-note" data-question="sample-script" x="22" y="99">Script approval: still open.</text>
           </g>
           <g data-node="send-outreach" data-chips="bottom" data-show-autonomy transform="translate(1172 188)">
             <rect class="card" width="224" height="136" rx="8"/>
@@ -738,6 +782,7 @@
             <text class="owner" x="22" y="46"></text>
             <text class="detail" x="22" y="65">File link and email.</text>
             <text class="detail" x="22" y="82">Handles revisions.</text>
+            <text class="open-note" data-question="delivery-email" x="22" y="99">Email approval: still open.</text>
           </g>
           <g data-node="get-paid" data-chips="bottom" data-show-autonomy transform="translate(314 692)">
             <rect class="card" width="224" height="136" rx="8"/>
@@ -762,11 +807,11 @@
           </g>
         </svg>
       </div>
-      <figcaption>The tabs show who steps in and where. Samples use another company's brand, so they go only to that company and are never posted publicly. Stage 7 counts as agent-run, with one customer script approval inside it.</figcaption>
+      <figcaption>The tabs show who acts and where. Samples use another company's brand, so they go only to that company and are never posted publicly. Stage 7 counts as agent-run, with one customer script approval inside it.</figcaption>
     </figure>
   </section>
 
-  <section data-show="company" aria-labelledby="rails-heading">
+  <section data-show="company" data-detail aria-labelledby="rails-heading">
     <h2 id="rails-heading">Guard rails</h2>
     <div class="rails" id="rails"></div>
   </section>
@@ -775,7 +820,8 @@
 <script>
 /* Update the map here. Change a word, reload, and the diagrams and counts follow.
    status:   live | building | planned | decide
-   autonomy: agent | approval | customer | human
+   autonomy: agent | approval | customer | human, or null where no level applies
+             (accounts, infrastructure, undecided parts and outputs). null draws no stripe.
    Only mark something live once it is working and verified. */
 const MAP = {
   lastUpdated: '2026-11-07',
@@ -783,46 +829,59 @@ const MAP = {
   /* Real results only. All zero until something has actually happened. */
   counters: { videosDelivered: 0, leadsFound: 0, emailsSent: 0, replies: 0 },
 
+  /* What comes next, as ids from the lists below, in order. The founder sets this. */
+  next: [],
+
+  /* Questions only the founder can answer. Each shows under Needs you, and on the map
+     wherever it applies. stage says which company stage it could change. Delete one once
+     it is answered, then change the stage or the drawing to match the answer. */
+  questions: [
+    { id: 'export-recheck', text: 'Do exported edits go back through the Validator?' },
+    { id: 'sample-script',  text: "Who approves a sample's script, if anyone?", stage: 3 },
+    { id: 'delivery-email', text: 'Does the delivery email need your approval?', stage: 8 },
+  ],
+
   /* Diagram 1, how Boiler Room works. step is the pipeline order. */
   technical: [
-    { id: 'naive-account',    name: 'Naive account',           status: 'live',     autonomy: 'agent' },
+    { id: 'naive-account',    name: 'Naive account',           status: 'live',     autonomy: null },
     { id: 'naive-team',       name: 'Naive agent team',        status: 'planned',  autonomy: 'agent' },
     { id: 'dashboard',        name: 'Customer dashboard',      status: 'planned',  autonomy: 'customer' },
     { id: 'scout',            name: 'Scout agent',             status: 'planned',  autonomy: 'agent' },
     { id: 'researcher',       name: 'Researcher agent',        status: 'planned',  autonomy: 'agent',    step: 1 },
     { id: 'director',         name: 'Director agent',          status: 'planned',  autonomy: 'agent',    step: 2 },
-    { id: 'validator',        name: 'Validator',               status: 'building', autonomy: 'agent',    step: 3 },
+    { id: 'validator',        name: 'Validator',               status: 'building', autonomy: null,       step: 3 },
     { id: 'script-approval',  name: 'Script approval',         status: 'planned',  autonomy: 'approval', step: 4 },
     { id: 'art-director',     name: 'Art Director agent',      status: 'planned',  autonomy: 'agent',    step: 5 },
-    { id: 'motion-library',   name: 'Motion library',          status: 'building', autonomy: 'agent',    step: 6 },
-    { id: 'audio',            name: 'Audio',                   status: 'planned',  autonomy: 'agent',    step: 7 },
-    { id: 'render-service',   name: 'Render service',          status: 'planned',  autonomy: 'agent',    step: 8 },
+    { id: 'motion-library',   name: 'Motion library',          status: 'building', autonomy: null,       step: 6 },
+    { id: 'audio',            name: 'Audio',                   status: 'planned',  autonomy: null,       step: 7 },
+    { id: 'render-service',   name: 'Render service',          status: 'planned',  autonomy: null,       step: 8 },
     { id: 'quality-check',    name: 'Quality Check agent',     status: 'planned',  autonomy: 'agent',    step: 9 },
     { id: 'account-manager',  name: 'Account Manager agent',   status: 'planned',  autonomy: 'agent',    step: 10 },
-    { id: 'naive-generation', name: 'Naive generation',        status: 'planned',  autonomy: 'agent' },
-    { id: 'elevenlabs',       name: 'ElevenLabs account',      status: 'live',     autonomy: 'agent' },
-    { id: 'render-host',      name: 'Render host',             status: 'decide',   autonomy: 'agent' },
-    { id: 'data-store',       name: 'Data store',              status: 'decide',   autonomy: 'agent' },
+    { id: 'naive-generation', name: 'Naive generation',        status: 'planned',  autonomy: null },
+    { id: 'elevenlabs',       name: 'ElevenLabs account',      status: 'live',     autonomy: null },
+    { id: 'render-host',      name: 'Render host',             status: 'decide',   autonomy: null },
+    { id: 'data-store',       name: 'Data store',              status: 'decide',   autonomy: null },
     { id: 'dashboard-editor', name: 'Dashboard editor',        status: 'planned',  autonomy: 'customer' },
     { id: 'browser-player',   name: 'Remotion browser player', status: 'planned',  autonomy: 'customer' },
-    { id: 'agentmail',        name: 'AgentMail inbox',         status: 'live',     autonomy: 'agent' },
-    { id: 'reply-webhook',    name: 'Reply webhook',           status: 'planned',  autonomy: 'agent' },
-    { id: 'exports',          name: 'Exports',                 status: 'planned',  autonomy: 'agent' },
+    { id: 'agentmail',        name: 'AgentMail inbox',         status: 'live',     autonomy: null },
+    { id: 'reply-webhook',    name: 'Reply webhook',           status: 'planned',  autonomy: null },
+    { id: 'exports',          name: 'Exports',                 status: 'planned',  autonomy: null },
   ],
 
   /* Diagram 2, how the company runs itself. stage is the loop order; the three
      entries without a stage are the founder's steps inside the human boundary.
-     person is the tab text where a person steps in. Leave it out and the tab goes. */
+     person is the tab text where a person acts, and who says which kind of person:
+     founder | customer | person. Leave person out and the tab goes. */
   company: [
     { id: 'find-leads',      stage: 1,  name: 'Find leads',          owner: 'Scout',           status: 'planned', autonomy: 'agent' },
     { id: 'qualify',         stage: 2,  name: 'Qualify',             owner: 'Scout',           status: 'planned', autonomy: 'agent' },
     { id: 'sample-video',    stage: 3,  name: 'Make a sample video', owner: 'Production crew', status: 'planned', autonomy: 'agent' },
-    { id: 'send-outreach',   stage: 4,  name: 'Send outreach',       owner: 'Account Manager', status: 'planned', autonomy: 'approval', person: 'Founder approves every email' },
-    { id: 'handle-replies',  stage: 5,  name: 'Handle replies',      owner: 'Account Manager', status: 'planned', autonomy: 'approval', person: 'Founder approves every answer' },
-    { id: 'customer-intake', stage: 6,  name: 'Customer intake',     owner: 'Customer',        status: 'planned', autonomy: 'customer', person: 'Customer submits a URL' },
-    { id: 'produce-video',   stage: 7,  name: 'Produce the video',   owner: 'Full pipeline',   status: 'planned', autonomy: 'agent',    person: 'Customer approves the script' },
+    { id: 'send-outreach',   stage: 4,  name: 'Send outreach',       owner: 'Account Manager', status: 'planned', autonomy: 'approval', person: 'Founder approves every email', who: 'founder' },
+    { id: 'handle-replies',  stage: 5,  name: 'Handle replies',      owner: 'Account Manager', status: 'planned', autonomy: 'approval', person: 'Founder approves every answer', who: 'founder' },
+    { id: 'customer-intake', stage: 6,  name: 'Customer intake',     owner: 'Customer',        status: 'planned', autonomy: 'customer', person: 'Customer submits a URL', who: 'customer' },
+    { id: 'produce-video',   stage: 7,  name: 'Produce the video',   owner: 'Full pipeline',   status: 'planned', autonomy: 'agent',    person: 'Customer approves the script', who: 'customer' },
     { id: 'deliver-revise',  stage: 8,  name: 'Deliver and revise',  owner: 'Account Manager', status: 'planned', autonomy: 'agent' },
-    { id: 'get-paid',        stage: 9,  name: 'Get paid',            owner: 'A person',        status: 'decide',  autonomy: 'human',    person: 'A person does this' },
+    { id: 'get-paid',        stage: 9,  name: 'Get paid',            owner: 'A person',        status: 'decide',  autonomy: 'human',    person: 'A person does this', who: 'person' },
     { id: 'learn',           stage: 10, name: 'Learn',               owner: 'Not assigned yet', status: 'planned', autonomy: 'agent' },
     { id: 'report',          stage: 11, name: 'Report',              owner: 'Coordinator',     status: 'planned', autonomy: 'agent' },
     { id: 'approve-email',      name: 'Approve outbound email',                   status: 'planned', autonomy: 'human' },
@@ -834,7 +893,7 @@ const MAP = {
   guardRails: [
     { id: 'agent-budgets',      name: 'Naive agent budgets',     value: '',                                detail: 'Budgets on each agent.', status: 'planned' },
     { id: 'media-cap',          name: 'Per-run media spend cap', value: '',                                detail: 'Separate cap, because agent budgets do not cap media jobs.', status: 'planned' },
-    { id: 'claims-gate',        name: 'Claims gate',             value: '',                                detail: 'The Validator rejects invented numbers before anything renders.', status: 'building' },
+    { id: 'claims-gate',        name: 'Claims gate',             value: '',                                detail: 'The Validator rejects invented numbers before script approval. Whether exported edits pass it too is still open.', status: 'building' },
     { id: 'audit-logs',         name: 'Naive audit logs',        value: '',                                detail: 'A record of what the agents did.', status: 'planned' },
     { id: 'elevenlabs-reserve', name: 'ElevenLabs reserve',      value: '3,531 credits',                   detail: 'Reserved for the videos that matter: the reference and demo videos only. No backup provider.', status: 'planned' },
     { id: 'naive-balance',      name: 'Naive balance',           value: '250.91 USD',                      detail: 'As of 2026-11-07.', status: null },
@@ -854,6 +913,7 @@ const AUTONOMY = {
   customer: 'the customer acts',
   human: 'a person does it',
 };
+const WHO = new Set(['founder', 'customer', 'person']);
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const everyNode = [...MAP.technical, ...MAP.company];
@@ -890,8 +950,9 @@ function drawPerson(g) {
 }
 
 /* Draws a label chip. It always carries a word and a shape, never colour alone. */
-function drawChip(parent, x, y, value, alignRight) {
+function drawChip(parent, x, y, value, alignRight, quiet) {
   const chip = svgEl('g', { class: 'chip', 'data-value': value }, parent);
+  if (quiet) chip.dataset.quiet = '';
   const bg = svgEl('rect', { class: 'chip-bg', height: 19, rx: 9.5 }, chip);
   const glyph = svgEl('g', { transform: 'translate(11.5 9.5)' }, chip);
   if (GLYPHS[value]) GLYPHS[value](glyph);
@@ -903,22 +964,25 @@ function drawChip(parent, x, y, value, alignRight) {
   return width;
 }
 
-function standaloneChip(host, value) {
+function standaloneChip(host, value, quiet) {
   const svg = svgEl('svg', { height: 21, 'aria-hidden': 'true' });
   host.prepend(svg);
-  const width = drawChip(svg, 1, 1, value, false);
+  const width = drawChip(svg, 1, 1, value, false, quiet);
   svg.setAttribute('width', width + 2);
 }
 
 function decorateNode(node, item) {
   node.dataset.status = item.status;
-  node.dataset.autonomy = item.autonomy;
+  const hasLevel = Boolean(item.autonomy);
 
   const card = node.querySelector('.card');
   const width = Number(card.getAttribute('width'));
   const height = Number(card.getAttribute('height'));
-  const stripe = svgEl('rect', { class: 'stripe', x: 2, y: 8, width: 10, height: height - 16, rx: 3 });
-  card.after(stripe);
+  if (hasLevel) {
+    node.dataset.autonomy = item.autonomy;
+    const stripe = svgEl('rect', { class: 'stripe', x: 2, y: 8, width: 10, height: height - 16, rx: 3 });
+    card.after(stripe);
+  }
 
   node.querySelector('.name').textContent = item.name;
   const owner = node.querySelector('.owner');
@@ -931,17 +995,17 @@ function decorateNode(node, item) {
     digit.textContent = number;
   }
 
-  const showAutonomy = 'showAutonomy' in node.dataset;
+  const quiet = item.status !== 'live';
   if (node.dataset.chips === 'top') {
     const statusWidth = drawChip(node, width - 10, 9, item.status, true);
-    if (showAutonomy) drawChip(node, width - 10 - statusWidth - 6, 9, item.autonomy, true);
+    if (hasLevel) drawChip(node, width - 10 - statusWidth - 6, 9, item.autonomy, true, quiet);
   } else {
     const statusWidth = drawChip(node, 22, height - 28, item.status, false);
-    if (showAutonomy) drawChip(node, 22 + statusWidth + 6, height - 28, item.autonomy, false);
+    if (hasLevel) drawChip(node, 22 + statusWidth + 6, height - 28, item.autonomy, false, quiet);
   }
 
   const tooltip = svgEl('title', {}, node);
-  tooltip.textContent = `${item.name}: ${item.status}, ${item.autonomy}`;
+  tooltip.textContent = `${item.name}: ${item.status}${hasLevel ? `, ${item.autonomy}` : ''}`;
 }
 
 /* Splits tab text into two lines at the space nearest the middle. */
@@ -959,8 +1023,10 @@ function twoLines(text) {
 function drawTab(tab) {
   const item = nodeById.get(tab.dataset.tabFor);
   if (!item || !item.person) { tab.style.display = 'none'; return; }
+  tab.dataset.who = item.who;
   const person = svgEl('g', { transform: 'translate(18 24)' }, tab);
-  drawPerson(person);
+  if (item.who === 'customer') GLYPHS.customer(person);
+  else drawPerson(person);
   twoLines(item.person).forEach((line, index) => {
     const text = svgEl('text', { class: 'tab-text', x: 32, y: 21 + index * 15 }, tab);
     text.textContent = line;
@@ -968,28 +1034,59 @@ function drawTab(tab) {
   svgEl('title', {}, tab).textContent = item.person;
 }
 
+/* Marks on the map that belong to an open question go when the question does. */
+function drawQuestionMarks() {
+  const open = new Set(MAP.questions.map(question => question.id));
+  document.querySelectorAll('[data-question]').forEach(mark => {
+    if (!open.has(mark.dataset.question)) mark.style.display = 'none';
+    else if (mark.matches('g')) drawChip(mark, 0, 0, 'decide', false);
+  });
+}
+
 function setText(id, text) {
   document.getElementById(id).textContent = text;
 }
 
+function fillList(id, lines, whenEmpty) {
+  const list = document.getElementById(id);
+  for (const line of lines.length ? lines : [whenEmpty]) {
+    const row = document.createElement('li');
+    row.textContent = line;
+    list.append(row);
+  }
+}
+
+function renderRightNow() {
+  const named = status => everyNode.filter(item => item.status === status).map(item => item.name);
+  standaloneChip(document.getElementById('now-head-live'), 'live');
+  standaloneChip(document.getElementById('now-head-building'), 'building');
+  standaloneChip(document.getElementById('now-head-needs'), 'decide');
+  fillList('now-live', named('live'), 'Nothing yet.');
+  fillList('now-building', named('building'), 'Nothing yet.');
+  fillList('now-needs', [...named('decide'), ...MAP.questions.map(question => question.text)], 'Nothing open.');
+  fillList('now-next', MAP.next.map(id => nodeById.get(id)?.name ?? id), 'Not set yet.');
+}
+
 function renderKey() {
-  const tally = (list, key, value) => list.filter(item => item[key] === value).length;
   const statusList = document.getElementById('key-status');
   for (const [value, meaning] of Object.entries(STATUS)) {
     const row = document.createElement('li');
-    row.innerHTML = `<span>${meaning}. <b>${tally(everyNode, 'status', value)} of ${everyNode.length} parts</b></span>`;
+    row.innerHTML = `<span>${meaning}</span>`;
     statusList.append(row);
     standaloneChip(row, value);
   }
   const autonomyList = document.getElementById('key-autonomy');
   for (const [value, meaning] of Object.entries(AUTONOMY)) {
+    const atLevel = stages.filter(stage => stage.autonomy === value);
+    const liveAtLevel = atLevel.filter(stage => stage.status === 'live').length;
     const row = document.createElement('li');
-    row.innerHTML = `<span>${meaning}. <b>${tally(stages, 'autonomy', value)} of ${stages.length} stages</b></span>`;
+    row.innerHTML = `<span>${meaning}. <b>Design target: ${atLevel.length} of ${stages.length} stages, live: ${liveAtLevel}</b></span>`;
     autonomyList.append(row);
-    const stripe = svgEl('svg', { width: 12, height: 20, 'aria-hidden': 'true', 'data-autonomy': value });
+    /* Drawn as on a planned part, so the key matches what the diagrams show. */
+    const stripe = svgEl('svg', { width: 12, height: 20, 'aria-hidden': 'true', 'data-autonomy': value, 'data-status': 'planned' });
     svgEl('rect', { class: 'stripe', width: 12, height: 20, rx: 3 }, stripe);
     row.prepend(stripe);
-    standaloneChip(row, value);
+    standaloneChip(row, value, true);
   }
 }
 
@@ -997,8 +1094,11 @@ function renderScoreboard() {
   const total = stages.length;
   const agentRun = stages.filter(stage => stage.autonomy === 'agent').length;
   const liveToday = stages.filter(stage => stage.status === 'live').length;
-  setText('tally-agent', `Agent-run stages: ${agentRun} of ${total}`);
+  const openStages = MAP.questions.filter(question => question.stage).map(question => question.stage);
   setText('tally-live', `Stages live today: ${liveToday} of ${total}`);
+  setText('tally-agent', `Agent-run stages: ${agentRun} of ${total}`);
+  setText('tally-agent-note', 'Design target, not what runs today.'
+    + (openStages.length ? ` Open questions on stages ${openStages.join(', ')} could lower it.` : ''));
 
   setText('count-videos', MAP.counters.videosDelivered);
   setText('count-leads', MAP.counters.leadsFound);
@@ -1006,22 +1106,23 @@ function renderScoreboard() {
   setText('count-replies', MAP.counters.replies);
 
   setText('decisions-today', liveToday === 0 ? `None yet: ${liveToday} of ${total} stages are live.` : `${liveToday} of ${total} stages are live.`);
-  const open = everyNode.filter(item => item.status === 'decide');
-  setText('open-count', `Still open for the founder (${open.length}):`);
-  setText('open-list', open.map(item => item.name).join(', ') + '.');
 
   setText('stepins-today', liveToday === 0 ? 'No stage runs yet, so there are no step-ins to report.' : `${liveToday} of ${total} stages are live.`);
-  const withPerson = stages.filter(stage => stage.person);
-  setText('stepins-design', `By design, a person steps in at ${withPerson.length} of ${total} stages:`);
-  const list = document.getElementById('stepins-list');
-  for (const stage of withPerson) {
-    const row = document.createElement('li');
-    row.textContent = `${stage.stage}. ${stage.name}: ${stage.person}`;
-    list.append(row);
+  setText('stepins-design', 'By design:');
+  const stagesFor = who => {
+    const numbers = stages.filter(stage => stage.person && stage.who === who).map(stage => stage.stage);
+    if (!numbers.length) return '';
+    return `${numbers.length === 1 ? 'stage' : 'stages'} ${numbers.join(', ')}`;
+  };
+  fillList('stepins-list', [
+    `You: ${[stagesFor('founder'), 'any-stage spend and deploy'].filter(Boolean).join(', plus ')}`,
+    stagesFor('person') && `A person: ${stagesFor('person')}`,
+    stagesFor('customer') && `Customers: ${stagesFor('customer')}`,
+  ].filter(Boolean));
+  if (openStages.length) {
+    setText('stepins-open', `Stages ${openStages.join(', ')} may add to this: see Needs you.`);
+    document.getElementById('stepins-open').hidden = false;
   }
-  const founderOnly = document.createElement('li');
-  founderOnly.textContent = 'Any stage: spending above caps, main and production stay with the founder';
-  list.append(founderOnly);
 }
 
 function renderGuardRails() {
@@ -1065,7 +1166,15 @@ function checkMap() {
   for (const item of everyNode) {
     if (!drawn.has(item.id)) problems.push(`${item.id} is in the data but not drawn`);
     if (!(item.status in STATUS)) problems.push(`${item.id} has an unknown status: ${item.status}`);
-    if (!(item.autonomy in AUTONOMY)) problems.push(`${item.id} has an unknown autonomy: ${item.autonomy}`);
+    const drawing = document.querySelector(`[data-node="${item.id}"]`);
+    const showsLevel = drawing?.hasAttribute('data-show-autonomy');
+    if (item.autonomy === null) {
+      if (item.stage || showsLevel) problems.push(`${item.id} needs an autonomy level`);
+    } else if (!(item.autonomy in AUTONOMY)) {
+      problems.push(`${item.id} has an unknown autonomy: ${item.autonomy}`);
+    } else if (drawing && !showsLevel) {
+      problems.push(`${item.id} has an autonomy level but its drawing does not show one`);
+    }
   }
   for (const id of drawn) {
     if (!nodeById.has(id)) problems.push(`${id} is drawn but not in the data`);
@@ -1077,6 +1186,10 @@ function checkMap() {
     if (stage.person && !document.querySelector(`[data-tab-for="${stage.id}"]`)) {
       problems.push(`${stage.id} has a person step but no tab is drawn for it`);
     }
+    if (stage.person && !WHO.has(stage.who)) problems.push(`${stage.id} has an unknown who: ${stage.who}`);
+  }
+  for (const id of MAP.next) {
+    if (!nodeById.has(id)) problems.push(`next lists ${id}, which is not in the data`);
   }
   for (const rail of MAP.guardRails) {
     if (rail.status !== null && !(rail.status in STATUS)) problems.push(`${rail.id} has an unknown status: ${rail.status}`);
@@ -1106,9 +1219,11 @@ document.querySelectorAll('[data-node]').forEach(node => {
   if (item) decorateNode(node, item);
 });
 document.querySelectorAll('[data-tab-for]').forEach(drawTab);
+drawQuestionMarks();
 document.querySelectorAll('[data-rail]').forEach(span => {
   span.textContent = MAP.guardRails.find(rail => rail.id === span.dataset.rail)?.value ?? '';
 });
+renderRightNow();
 renderKey();
 renderScoreboard();
 renderGuardRails();
