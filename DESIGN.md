@@ -19,7 +19,7 @@ components, using the tokens and rules below.
 | `design-system/tokens.json` | The same tokens as data, for the app's build |
 | `design-system/components.css` | The sample components, showing how tokens combine |
 | `design-system/logo/` | Mark, blink frame, lockups, wordmarks, steam puff. All SVG |
-| `design-system/icons/` | 20 pixel icons as SVG, plus `icons.js` for static pages |
+| `design-system/icons/` | 24 pixel icons as SVG, plus `icons.js` for static pages |
 | `design-system/pixel-art.mjs` | Draws every logo and icon from text grids. Edit a grid, run `node design-system/pixel-art.mjs` |
 
 ## Direction
@@ -205,13 +205,16 @@ The element needs an opaque background. In Tailwind, make it a plugin utility.
 
 ## Icons
 
-20 icons on a 12 by 12 grid, one colour, drawn in `currentColor`: play, check, arrow-right, clock,
+24 icons on a 12 by 12 grid, one colour, drawn in `currentColor`: play, check, arrow-right, clock,
 sparkle, mail, download, search, clapper, shield, brush, film, note, gear, eye, user, warning,
-globe, plus, cloud. Use them at 12, 24 or 36px.
+globe, plus, cloud, doc, terminal, rocket, crown. Use them at 12, 24 or 36px.
 
 Each crew member has an icon: Researcher `search`, Director `clapper`, Validator `shield`, Art
 Director `brush`, Motion `film`, Audio `note`, Render `gear`, Quality Check `eye`, Account Manager
 `mail`, the customer `user`.
+
+The company's agents have theirs: the CEO `crown`, Product `doc`, Design `brush`, engineers
+`terminal`, and a release to production `rocket`.
 
 To add one, draw its grid in `ICONS` in `pixel-art.mjs` and run the script. In the app, generate
 React components from the same grids, or import the SVGs.
