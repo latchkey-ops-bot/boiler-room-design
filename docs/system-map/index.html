@@ -1045,21 +1045,26 @@ const MAP = {
 
   /* What each team can use. label marks a team that is not fully running yet, such as DRY RUN. */
   tools: [
-    { team: 'Engineering',        tools: ['Both repos, through pull requests', 'Bash', 'Cloudflare deploy, rollback, migration and log commands', 'The engineering skill: deploying releases and bug fixes'] },
+    { team: 'Engineering',        tools: ['Repo access through a GitHub token on its computers', 'Bash', 'Cloudflare deploy, rollback, migration and log commands', 'The engineering skill: deploying releases and bug fixes'], note: 'Clerk keys are app secrets that agents never hold.' },
     { team: 'Product and design', tools: ['The design repo', 'Image generation'] },
-    { team: 'GTM',                tools: ['A Boiler Room app account, to make free sample films', 'X, to quote-post a launch post with its film: needs a connected X account', 'AgentMail, for cold email with a film link'], note: 'Agents decide on the board and code sends.', label: 'DRY RUN' },
+    { team: 'GTM',                tools: ['A Boiler Room app account, to make free sample films', 'X, to quote-post a launch post with its film: needs a connected X account', 'AgentMail, for cold email with a film link', "Naive lead data: Naive's built-in read-only data and social data tools"], note: 'Agents decide on the board and code sends.', label: 'DRY RUN' },
     { team: 'CEO',                tools: ['The board and its skill'], note: 'Every admin tool it would otherwise get as the account CEO is denied by name.' },
   ],
 
   /* Guard rails. status null means a rule or a limit, not something being built: label says
      which. This repo is public: no account balances or credit counts here. */
   guardRails: [
+    { id: 'untrusted-content',  name: 'Untrusted content',       value: '',                                detail: 'Agents that read untrusted content, like customer websites, inbound email, social posts or lead data, cannot push code, deploy, send or spend.', status: null, label: 'RULE' },
     { id: 'ship-path',          name: 'Path to production',      value: '',                                detail: 'Engineers open pull requests into dev that must pass tests. When a goal is delivered, the CEO creates a RELEASE card; the engineering lead promotes dev to main through a pull request and deploys production, with checks and rollback. Nobody else may touch main or production.', status: null, label: 'RULE' },
     { id: 'branch-rules',       name: 'Branch rules',            value: '',                                detail: 'On main and dev, in both repos: a pull request is required, with no force push and no deletion.', status: null, label: 'RULE' },
     { id: 'ceo-tools',          name: 'CEO tools',               value: '',                                detail: 'Every one of the hundreds of admin tools the account CEO would otherwise get is denied by name. It is offered only the board and its skill.', status: null, label: 'RULE' },
     { id: 'crew-cards',         name: 'Crew and company cards',  value: '',                                detail: 'Production crew agents cannot write company cards.', status: null, label: 'RULE' },
     { id: 'gtm-dry-run',        name: 'GTM dry run',             value: '',                                detail: 'GTM agents decide on the board and code sends. They post and send nothing until activated.', status: null, label: 'RULE' },
+    { id: 'app-secrets',        name: 'App secrets',             value: '',                                detail: 'Clerk keys and other app secrets live as Cloudflare Worker secrets. No agent holds them.', status: null, label: 'RULE' },
     { id: 'claims-gate',        name: 'Claims gate',             value: '',                                detail: 'The Validator rejects invented numbers before script approval. Whether exported edits pass it too is still open.', status: 'live' },
+    { id: 'agent-budgets',      name: 'Agent budgets',           value: '',                                detail: 'Every agent has a daily cap and a per-task ceiling on Naive.', status: 'live' },
+    { id: 'render-cost-limit',  name: 'Per-run render cost limit', value: '',                              detail: 'The render service refuses to start a render whose estimated cost exceeds its limit.', status: 'live' },
+    { id: 'audit-trail',        name: 'Audit trail',             value: '',                                detail: 'Every agent session, card and comment is logged on Naive.', status: 'live' },
     { id: 'elevenlabs-reserve', name: 'ElevenLabs reserve',      value: '',                                detail: 'Customer films are music-led and readable with sound off. ElevenLabs is kept for the films that matter, such as the demo film.', status: null, label: 'RULE' },
     { id: 'agentmail-plan',     name: 'AgentMail free plan',     value: '3,000 emails a month, 3 inboxes', detail: 'Plan limit.', status: null, label: 'LIMIT' },
   ],

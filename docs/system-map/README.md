@@ -10,7 +10,7 @@ Most of the eleven-stage loop is still the design, not what runs today. The scor
 
 As of 2026-11-08:
 
-- **Live:** Naive account, Validator, Motion library, Render service, `campaign.json` contract, Scene specs and crew skills, ElevenLabs account, Render host, Data store, AgentMail inbox, Company board, Claims gate
+- **Live:** Naive account, Validator, Motion library, Render service, `campaign.json` contract, Scene specs and crew skills, ElevenLabs account, Render host, Data store, AgentMail inbox, Company board, Claims gate, Agent budgets, Per-run render cost limit, Audit trail
 - **Building:** First real film, Website and app, Scout agent, Researcher agent, Director agent, Script approval, Art Director agent, Quality Check agent, Find leads, Qualify, Make a sample film, Send outreach, Handle replies, Customer intake, Produce the film, Report, CEO agent, Engineering, Product and design, GTM
 - **Open decisions:** Get paid, and whether exported edits go back through the Validator
 - **Next:** First real film, One command, URL to film, GTM activation, Test suites per role, Outcome grading, Company scorecard, Lesson cards
