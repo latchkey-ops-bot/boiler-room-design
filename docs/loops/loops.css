@@ -1,0 +1,278 @@
+/* The loop diagrams: a 1600 by 900 stage, scaled to fit any screen, built from the design system. */
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  background: var(--br-dots) var(--br-paper);
+}
+
+.stage {
+  --br-px: 3px;
+  --scale: 1;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1600px;
+  height: 900px;
+  transform: translate(-50%, -50%) scale(var(--scale));
+  transform-origin: center;
+}
+
+/* ---------- Header ---------- */
+
+.stage-head {
+  position: absolute;
+  left: 56px;
+  right: 56px;
+  top: 36px;
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+}
+.stage-head .titles { display: grid; gap: 6px; flex: 1 1 auto; min-width: 0; max-width: 940px; }
+.stage-head h1 { font-size: 46px; }
+.stage-head .sub { font-size: 17px; color: var(--br-muted); }
+.stage-head .right { flex: none; margin-left: auto; display: grid; justify-items: end; gap: 12px; }
+.loop-tabs { display: flex; gap: 0; }
+.loop-tabs a {
+  --br-px: 2px;
+  padding: 7px 12px 6px;
+  margin: 2px;
+  background: var(--br-white);
+  color: var(--br-deep);
+  font: 600 12px / 1.3 var(--br-font-label);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  box-shadow: 0 -2px 0 0 var(--br-deep), 0 2px 0 0 var(--br-deep), -2px 0 0 0 var(--br-deep), 2px 0 0 0 var(--br-deep);
+}
+.loop-tabs a[aria-current='page'] { background: var(--br-deep); color: var(--br-white); }
+.loop-tabs a:hover { box-shadow: 0 -2px 0 0 var(--br-deep), 0 2px 0 0 var(--br-deep), -2px 0 0 0 var(--br-deep), 2px 0 0 0 var(--br-deep); background: var(--br-sky-soft); }
+.loop-tabs a[aria-current='page']:hover { background: var(--br-deep); }
+
+/* ---------- Pipes ---------- */
+
+.pipes {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: visible;
+}
+.pipes polyline {
+  fill: none;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  shape-rendering: crispEdges;
+}
+.pipe-outer { stroke: var(--br-deep); stroke-width: 18; }
+.pipe-inner { stroke: var(--br-sky); stroke-width: 8; }
+.pipe-back {
+  stroke: var(--br-error-ink);
+  stroke-width: 5;
+  stroke-dasharray: 12 9;
+  opacity: 0.45;
+}
+.pipe-back.hinted { opacity: 1; stroke-width: 7; }
+.pipe-flow {
+  stroke: var(--br-white);
+  stroke-width: 4;
+  stroke-dasharray: 8 16;
+}
+.pipe-flow.back { stroke: var(--br-error-ink); stroke-width: 7; stroke-dasharray: 12 9; }
+
+.pipe-label {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+}
+
+/* ---------- Stations ---------- */
+
+.station {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  width: 236px;
+  height: 112px;
+  margin: 0;
+  padding: 12px 14px;
+  transform: translate(-50%, -50%);
+}
+.station .crew { width: 52px; height: 52px; margin: 3px; }
+.station .crew .icon { width: 26px; height: 26px; }
+.station .name { font: 800 21px / 1.1 var(--br-font-display); letter-spacing: -0.01em; color: var(--br-deep); }
+.station .what { font-size: 14px; line-height: 1.3; color: var(--br-muted); margin-top: 2px; }
+.station .st-status { position: absolute; right: 8px; bottom: -14px; }
+.stage.hide-status .st-status { display: none; }
+
+.station[data-kind='start'],
+.station[data-kind='end'] { background: var(--br-cream); --drop: var(--br-cream-deep); }
+.station[data-kind='human'] { --frame: var(--br-attention-ink); }
+.station[data-kind='human'] .crew { background: var(--br-attention-soft); color: var(--br-attention-ink); --frame: var(--br-attention-ink); }
+
+.station[data-state='done'] .crew { background: var(--br-success-soft); color: var(--br-success-ink); --frame: var(--br-success-ink); }
+.station[data-state='active'] {
+  --lift: calc(var(--br-px) * 3);
+  background: var(--br-sky-soft);
+  transform: translate(calc(-50% - 3px), calc(-50% - 3px));
+}
+.station[data-state='active'] .crew { background: var(--br-sky); color: var(--br-ink); --frame: var(--br-deep); }
+.station[data-kind='human'][data-state='active'] { background: var(--br-attention-soft); --drop: var(--br-pink); }
+.station[data-kind='human'][data-state='active'] .crew { background: var(--br-pink); color: var(--br-ink); --frame: var(--br-attention-ink); }
+.station[data-state='active'][data-verdict='fail'] { --frame: var(--br-error-ink); --drop: #FFB9B1; background: var(--br-error-soft); }
+
+/* What a station says when it's done: passed, sent back, rendering */
+.verdict {
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  transform: translateX(-50%);
+  display: none;
+}
+.station[data-state='active'] .verdict { display: inline-flex; }
+
+.station .meter { position: absolute; left: 14px; right: 14px; bottom: 10px; height: 14px; display: none; }
+.station[data-state='active'] .meter { display: block; }
+.station .meter > span { transition: none; }
+
+/* Steam rises while a crew member is working: the design decision for "the crew is busy" */
+.station .steam {
+  position: absolute;
+  right: -18px;
+  top: -34px;
+  width: 36px;
+  opacity: 0;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+.station[data-state='active'] .steam { animation: br-rise calc(var(--br-frame) * 18) steps(9) infinite; }
+.station[data-state='active'] .steam + .steam { animation-delay: calc(var(--br-frame) * 9); }
+.station[data-kind='human'] .steam,
+.station[data-kind='start'] .steam,
+.station[data-kind='end'] .steam { display: none; }
+
+/* The end of the line gets sparkles */
+.station .sparkles { position: absolute; inset: -30px; pointer-events: none; display: none; }
+.station[data-state='active'][data-kind='end'] .sparkles { display: block; }
+.sparkles .icon { position: absolute; width: 18px; height: 18px; color: var(--br-pink); animation: br-led calc(var(--br-frame) * 6) steps(1) infinite; }
+.sparkles .icon:nth-child(1) { left: -6px; top: 6px; }
+.sparkles .icon:nth-child(2) { right: -4px; top: 0; color: var(--br-steel); animation-delay: calc(var(--br-frame) * 3); }
+.sparkles .icon:nth-child(3) { right: 10px; bottom: -6px; color: var(--br-sky); }
+.sparkles .icon:nth-child(4) { left: 20px; bottom: -10px; color: var(--br-deep); animation-delay: calc(var(--br-frame) * 2); }
+
+/* ---------- The packet: what travels down the pipe ---------- */
+
+.packet {
+  --br-px: 3px;
+  --frame: var(--br-ink);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 12px;
+  background: var(--br-white);
+  color: var(--br-ink);
+  font: 600 15px / 1.2 var(--br-font-mono);
+  white-space: nowrap;
+  box-shadow: 0 -3px 0 0 var(--frame), 0 3px 0 0 var(--frame), -3px 0 0 0 var(--frame), 3px 0 0 0 var(--frame), 6px 6px 0 0 var(--br-sky);
+}
+.packet .icon { width: 16px; height: 16px; color: var(--br-deep); }
+.packet[hidden] { display: none; }
+.packet[data-tone='fail'] { background: var(--br-error-soft); color: var(--br-error-ink); --frame: var(--br-error-ink); }
+.packet[data-tone='fail'] .icon { color: var(--br-error-ink); }
+.packet[data-tone='pass'] { background: var(--br-success-soft); color: var(--br-success-ink); --frame: var(--br-success-ink); }
+.packet[data-tone='pass'] .icon { color: var(--br-success-ink); }
+.packet[data-tone='human'] { background: var(--br-attention-soft); color: var(--br-attention-ink); --frame: var(--br-attention-ink); }
+.packet[data-tone='human'] .icon { color: var(--br-attention-ink); }
+
+/* ---------- Notes on the stage ---------- */
+
+.stage-note {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+}
+.legend { display: flex; gap: 20px; font-size: 14px; color: var(--br-muted); }
+.legend div { display: flex; align-items: center; gap: 8px; }
+.legend .swatch { flex: none; width: 30px; height: 14px; }
+.legend .main { background: linear-gradient(var(--br-deep) 0 3px, var(--br-sky) 3px 11px, var(--br-deep) 11px 14px); }
+.legend .back { background: repeating-linear-gradient(90deg, var(--br-error-ink) 0 8px, transparent 8px 13px) 0 5px / 100% 4px no-repeat; }
+.legend .person { width: 14px; margin: 0 8px; background: var(--br-attention-soft); box-shadow: 0 -2px 0 0 var(--br-attention-ink), 0 2px 0 0 var(--br-attention-ink), -2px 0 0 0 var(--br-attention-ink), 2px 0 0 0 var(--br-attention-ink); }
+.contract { display: flex; align-items: center; gap: 14px; padding: 12px 18px; font-size: 16px; line-height: 1.4; white-space: nowrap; }
+.contract img { flex: none; width: 48px; height: 48px; image-rendering: pixelated; }
+
+/* ---------- The board, for the company loop ---------- */
+
+.board {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 12px;
+  width: 610px;
+  padding: 16px 20px;
+  transform: translate(-50%, -50%);
+}
+.board .board-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.board .now { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--br-paper); }
+.board .now .card-title { font: 600 17px / 1.2 var(--br-font-mono); color: var(--br-ink); }
+.board .now .icon { color: var(--br-deep); width: 20px; height: 20px; }
+.board .now .who { margin-left: auto; }
+.board ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; min-height: 66px; align-content: start; }
+.board li { display: flex; align-items: center; gap: 10px; font: 400 14px / 1.3 var(--br-font-mono); color: var(--br-muted); }
+.board li .icon { width: 12px; height: 12px; color: var(--br-success-ink); }
+.board li:last-child { color: var(--br-ink); }
+
+/* ---------- Caption, progress and controls ---------- */
+
+.caption {
+  position: absolute;
+  left: 56px;
+  right: 56px;
+  bottom: 34px;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  min-height: 128px;
+  margin: 0;
+  padding: 18px 24px;
+}
+.caption .cap-num { font-size: 64px; text-align: center; }
+.caption .cap-title { font-size: 30px; }
+.caption .cap-text { font-size: 20px; line-height: 1.45; margin-top: 4px; max-width: 58em; }
+.caption .cap-side { display: grid; justify-items: end; gap: 12px; }
+.caption .controls { display: flex; gap: 6px; }
+.caption .controls .btn { padding: 8px 10px; }
+.caption .controls .btn .icon { width: 16px; height: 16px; }
+.caption .prev .icon { transform: scaleX(-1); }
+.pause-glyph {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(90deg, currentColor 0 5px, transparent 5px 11px, currentColor 11px 16px);
+}
+.dots { display: flex; gap: 6px; }
+.dots button {
+  width: 14px;
+  height: 14px;
+  margin: 2px;
+  padding: 0;
+  border: 0;
+  background: var(--br-white);
+  box-shadow: 0 -2px 0 0 var(--br-steel), 0 2px 0 0 var(--br-steel), -2px 0 0 0 var(--br-steel), 2px 0 0 0 var(--br-steel);
+  cursor: pointer;
+}
+.dots button.seen { background: var(--br-sky); }
+.dots button[aria-current='step'] { background: var(--br-deep); box-shadow: 0 -2px 0 0 var(--br-deep), 0 2px 0 0 var(--br-deep), -2px 0 0 0 var(--br-deep), 2px 0 0 0 var(--br-deep); }
+.keys { color: var(--br-muted); }
