@@ -12,7 +12,7 @@ As of 2026-11-08:
 
 - **Live:** Naive account, Validator, `campaign.json` contract, Scene specs, ElevenLabs account, AgentMail inbox, Company board, Claims gate
 - **Building:** Researcher agent, Director agent, Art Director agent, Motion library, Render service, Quality Check agent, Render host, Produce the film, Report, CEO agent, Engineering, Product and design, Naive agent budgets
-- **Needs you:** Get paid, and whether exported edits go back through the Validator
+- **Open decisions:** Get paid, and whether exported edits go back through the Validator
 - **Next:** One command, URL to film, Scene components, CEO channel, Official CEO, Test suites per role, Company scorecard, Lesson cards
 
 Click any image below to open it at full size. This first one stays readable at page width; the diagram images carry the same panels above the detail.
@@ -21,7 +21,7 @@ Click any image below to open it at full size. This first one stays readable at 
 
 ## Diagram 1: how Boiler Room works
 
-This is the production crew: the product's own runtime, maintained by engineering and separate from the company's chain of command. Both ways in feed one ten-step pipeline. The heavy dashed arrows are the two feedback loops. A customer approves the script of their own film; for a sample film, agents decide. The DECIDE marker on the export arrow is an open question: whether an exported edit passes the Validator first.
+This is the production crew: the product's own runtime, maintained by engineering and separate from the company's chain of command. Both ways in feed one ten-step pipeline. Scout, the way in for leads, is a company GTM agent from Diagram 2, not part of the crew. The heavy dashed arrows are the two feedback loops. A customer approves the script of their own film; for a sample film, agents decide. The DECIDE marker on the export arrow is an open question: whether an exported edit passes the Validator first.
 
 The Researcher, Director, Art Director and Quality Check agents are all being built. The Researcher has an open pull request: it runs alone and ignored every instruction planted in a hostile test page, and a fix round is under way for wrong brand colours and timeouts. The other three have their skills merged. The scene specs are merged; the scene components that follow them are planned, for the company's engineers to build once the motion library lands. One command from URL to film comes next, after the crew agents.
 
@@ -31,13 +31,13 @@ The Researcher, Director, Art Director and Quality Check agents are all being bu
 
 Eleven stages form a closed loop. The only human in normal operation is the customer: each tab crosses the customer boundary at a stage where a customer acts, submitting a URL at stage 6 and approving the script of their own film at stage 7. Stages 1 to 5 belong to the GTM team, which is inactive for now. Stage 9, Get paid, has no owner chosen yet.
 
-The middle is the company as it is set up on Naive. There is one board, and the CEO agent is its only coordinator. Every company agent is on its roster, so the teams are drawn side by side under the board rather than as a chain of command. Leads lead by assigning cards, and assignment starts the assignee within seconds. Cards can wait on other cards, and every finished card reports to the CEO automatically. That flow is verified on the live company with one test card. The agents exist and are provisioned from code, but the CEO's 2-hourly schedule is paused until the motion library lands, so the CEO and the teams are still marked building.
+The middle is the company as it is set up on Naive. There is one board, and the CEO agent is its only coordinator. Every company agent is on its roster, so the teams are drawn side by side under the board rather than as a chain of command. Leads lead by assigning cards, and assignment starts the assignee within seconds. Cards can wait on other cards, and every finished card reports to the CEO automatically. That flow is verified on the live company with one test card. The agents exist and are provisioned from code, but the CEO's 2-hourly schedule is paused until the motion library lands, so the CEO, Engineering and Product and design are marked building; GTM is planned and inactive until the founder says the product is ready.
 
 Work moves by card:
 
 | Card | What happens |
 | --- | --- |
-| `DIR` | The CEO sets a goal. Product writes a spec, with a `DESIGN` card first if there is UI. |
+| `DIR` | The CEO sets a goal. Product writes a spec, and opens a `DESIGN` card for Design if there is UI. |
 | `BUILD` | The spec goes to the engineering lead. |
 | `ENG` | The lead hands tasks to engineers, who open pull requests into dev that must pass tests. |
 | `SHIP` | Back to the lead, who merges into dev and deploys staging. The CEO then checks it against the goal. |

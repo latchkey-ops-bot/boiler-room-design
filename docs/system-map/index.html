@@ -163,10 +163,7 @@
   .lane { font: 700 11px var(--font-sans); letter-spacing: .08em; fill: var(--ink-2); }
   .lane-note { font: 500 12px var(--font-sans); fill: var(--ink-2); }
   .cell { fill: var(--surface-2); stroke: var(--line-soft); }
-  .cell-text { font: 600 12.5px var(--font-sans); fill: var(--ink); text-anchor: middle; }
-  .math-big { font: 700 28px var(--font-sans); fill: var(--ink); text-anchor: middle; }
-  .math-word { font: 500 12px var(--font-sans); fill: var(--ink-2); text-anchor: middle; }
-  .math-op { font: 600 18px var(--font-sans); fill: var(--ink-2); text-anchor: middle; }
+  .cell-label { font: 500 12px var(--font-sans); fill: var(--ink-2); text-anchor: middle; }
   .thumb { fill: none; stroke: var(--ink-2); stroke-width: 1.5; }
 
   .flow { fill: none; stroke: var(--line); stroke-width: 1.75; marker-end: url(#arrow); }
@@ -304,7 +301,7 @@
     <div class="now-lists">
       <div><h3 class="now-head" id="now-head-live" aria-label="Live"></h3><ul id="now-live"></ul></div>
       <div><h3 class="now-head" id="now-head-building" aria-label="Building"></h3><ul id="now-building"></ul></div>
-      <div><h3 class="now-head" id="now-head-needs">Needs you</h3><ul id="now-needs"></ul></div>
+      <div><h3 class="now-head" id="now-head-needs">Open decisions</h3><ul id="now-needs"></ul></div>
       <div><h3 class="now-head">Next</h3><ul id="now-next"></ul></div>
     </div>
   </section>
@@ -378,7 +375,7 @@
 
           <!-- Lane labels -->
           <text class="lane" x="24" y="20">CONTROL LAYER</text>
-          <text class="lane-note" x="396" y="20">Runs every node marked AGENT below. Engineering maintains it.</text>
+          <text class="lane-note" x="396" y="20">Planned: will run every crew agent below. Engineering maintains it.</text>
           <text class="lane" x="24" y="164">WAY IN: CUSTOMER</text>
           <text class="lane" x="396" y="168">PIPELINE: SAME PATH FOR BOTH</text>
           <text class="lane" x="928" y="164">WAY IN: LEAD</text>
@@ -408,7 +405,7 @@
           <path class="flow" d="M1068 869 V839"/>
           <path class="flow" d="M164 1166 V1139"/>
           <path class="flow" d="M396 1324 H305"/>
-          <path class="flow" d="M164 1396 V1417"/>
+          <path class="flow" d="M164 1384 V1417"/>
           <path class="flow" d="M304 1466 H338 a12 12 0 0 0 12 -12 V1372 a12 12 0 0 1 12 -12 H395"/>
 
           <!-- Feedback loop 1: Validator back to Director -->
@@ -432,7 +429,7 @@
           <text class="edge-label" x="628" y="1032">voice, music, sound effects, word timing</text>
           <text class="edge-label" x="628" y="1156">rendered film</text>
           <text class="edge-label" x="628" y="1280">passes review, with the review report</text>
-          <text class="edge-label" x="628" y="1404">delivers up to 18 exports</text>
+          <text class="edge-label" x="628" y="1404">delivers the exports</text>
           <text class="edge-label" x="350" y="462" text-anchor="middle">schema</text>
           <text class="edge-label" x="350" y="710" text-anchor="middle">new assets</text>
           <text class="edge-label" x="350" y="958" text-anchor="middle">audio, timing</text>
@@ -443,7 +440,7 @@
           <text class="edge-label" x="176" y="1157">edits <tspan class="mono">campaign.json</tspan></text>
           <text class="edge-label" x="350" y="1300" text-anchor="middle">email with</text>
           <text class="edge-label" x="350" y="1316" text-anchor="middle">file link</text>
-          <text class="edge-label" x="176" y="1410">replies by webhook</text>
+          <text class="edge-label" x="176" y="1405">replies by webhook</text>
           <text class="edge-label" x="312" y="1484">replies</text>
 
           <!-- Open question sitting on the export arrow. Its chip is drawn from MAP.questions. -->
@@ -481,10 +478,11 @@
             <text class="detail" x="22" y="114">development instance.</text>
           </g>
           <g data-node="scout" data-chips="bottom" data-show-autonomy transform="translate(928 174)">
-            <rect class="card" width="280" height="104" rx="8"/>
+            <rect class="card" width="280" height="120" rx="8"/>
             <text class="name" x="22" y="25"></text>
             <text class="detail" x="22" y="46">Finds a lead in Naive lead data.</text>
-            <text class="detail" x="22" y="63">A GTM agent, inactive for now.</text>
+            <text class="detail" x="22" y="63">A company GTM agent (Diagram 2),</text>
+            <text class="detail" x="22" y="80">not crew. Inactive for now.</text>
           </g>
 
           <!-- The ten-step pipeline -->
@@ -493,7 +491,7 @@
             <text class="name" x="46" y="25"></text>
             <text class="detail" x="22" y="45">Captures screenshots, colours, fonts, logo and quoted claims.</text>
             <text class="detail" x="22" y="62">Runs alone. Ignored every instruction in a hostile test page.</text>
-            <text class="detail" x="22" y="79">Five-site tests found wrong colours and timeouts: fixing.</text>
+            <text class="detail" x="22" y="79">Open pull request. Fixing wrong colours and timeouts from tests.</text>
           </g>
           <g data-node="director" data-chips="top" data-show-autonomy transform="translate(396 302)">
             <rect class="card" width="440" height="88" rx="8"/>
@@ -507,7 +505,7 @@
             <text class="name" x="46" y="25"></text>
             <text class="detail" x="22" y="45">Pre-render gate. Rejects invented numbers, missing assets,</text>
             <text class="detail" x="22" y="62">bad timing, long text and low contrast.</text>
-            <text class="detail" x="22" y="79">Merged to dev, 522 tests passing.</text>
+            <text class="detail" x="22" y="79">Merged to dev, tests passing.</text>
           </g>
           <g data-node="script-approval" data-chips="top" data-show-autonomy transform="translate(396 550)">
             <rect class="card" width="440" height="88" rx="8"/>
@@ -526,7 +524,7 @@
           <g data-node="motion-library" data-chips="top" transform="translate(396 798)">
             <rect class="card" width="440" height="88" rx="8"/>
             <text class="name" x="46" y="25"></text>
-            <text class="detail" x="22" y="45"><tspan class="mono">packages/motion</tspan>: Remotion scenes, transitions, motion tokens.</text>
+            <text class="detail" x="22" y="45"><tspan class="mono">packages/motion</tspan>: Remotion transitions and motion tokens.</text>
             <text class="detail" x="22" y="62">Open pull request. Renders a validated campaign</text>
             <text class="detail" x="22" y="79">in 16:9, 9:16 and 1:1.</text>
           </g>
@@ -569,12 +567,11 @@
             <text class="detail" x="22" y="46"><tspan class="mono">packages/schema</tspan>: the format the</text>
             <text class="detail" x="22" y="63">Director writes and the Validator checks.</text>
           </g>
-          <g data-node="elevenlabs" data-chips="bottom" transform="translate(24 903)">
-            <rect class="card" width="280" height="126" rx="8"/>
+          <g data-node="elevenlabs" data-chips="bottom" transform="translate(24 914)">
+            <rect class="card" width="280" height="104" rx="8"/>
             <text class="name" x="22" y="25"></text>
             <text class="detail" x="22" y="46">Connected. Kept for the films that</text>
             <text class="detail" x="22" y="63">matter, such as the demo film.</text>
-            <text class="detail" x="22" y="80">No backup provider.</text>
           </g>
           <g data-node="scene-components" data-chips="bottom" transform="translate(928 734)">
             <rect class="card" width="280" height="104" rx="8"/>
@@ -616,11 +613,10 @@
 
           <!-- Email -->
           <g data-node="agentmail" data-chips="bottom" transform="translate(24 1280)">
-            <rect class="card" width="280" height="116" rx="8"/>
+            <rect class="card" width="280" height="104" rx="8"/>
             <text class="name" x="22" y="25"></text>
-            <text class="detail" x="22" y="44"><tspan class="mono">boilerroom@agentmail.to</tspan></text>
-            <text class="detail" x="22" y="61">Sender name shows AgentMail:</text>
-            <text class="detail" x="22" y="78">still to change to Boiler Room.</text>
+            <text class="detail" x="22" y="46">Sender name shows AgentMail:</text>
+            <text class="detail" x="22" y="63">still to change to Boiler Room.</text>
           </g>
           <g data-node="reply-webhook" data-chips="bottom" transform="translate(24 1418)">
             <rect class="card" width="280" height="96" rx="8"/>
@@ -632,30 +628,20 @@
           <g data-node="exports" data-chips="bottom" transform="translate(396 1418)">
             <rect class="card" width="812" height="124" rx="8"/>
             <text class="name" x="22" y="25"></text>
-            <text class="detail" x="22" y="47">One campaign, up to 18 exports.</text>
+            <text class="detail" x="22" y="47">One campaign, in three formats.</text>
             <text class="detail" x="22" y="65">Each format has its own layout</text>
             <text class="detail" x="22" y="83">rather than a crop.</text>
 
-            <rect class="cell" x="256" y="14" width="92" height="96" rx="6"/>
-            <text class="math-big" x="302" y="62">3</text>
-            <text class="math-word" x="302" y="86">hooks</text>
-            <text class="math-op" x="360" y="68">&#215;</text>
-            <rect class="cell" x="372" y="14" width="172" height="96" rx="6"/>
-            <text class="math-word" x="458" y="32">3 formats</text>
-            <rect class="thumb" x="386" y="50" width="56" height="31.5" rx="1.5"/>
-            <text class="math-word" x="414" y="100">16:9</text>
-            <rect class="thumb" x="456" y="44" width="21" height="37.5" rx="1.5"/>
-            <text class="math-word" x="466.5" y="100">9:16</text>
-            <rect class="thumb" x="494" y="46" width="35.5" height="35.5" rx="1.5"/>
-            <text class="math-word" x="511.75" y="100">1:1</text>
-            <text class="math-op" x="556" y="68">&#215;</text>
-            <rect class="cell" x="568" y="14" width="104" height="96" rx="6"/>
-            <text class="math-big" x="620" y="62">2</text>
-            <text class="math-word" x="620" y="86">calls to action</text>
-            <text class="math-op" x="684" y="68">=</text>
-            <rect class="cell" x="696" y="14" width="104" height="96" rx="6"/>
-            <text class="math-big" x="748" y="62">18</text>
-            <text class="math-word" x="748" y="86">exports at most</text>
+            <!-- The three formats the motion library renders -->
+            <rect class="cell" x="256" y="14" width="172" height="96" rx="6"/>
+            <rect class="thumb" x="294" y="26" width="96" height="54" rx="2"/>
+            <text class="cell-label" x="342" y="100">16:9 landscape</text>
+            <rect class="cell" x="442" y="14" width="172" height="96" rx="6"/>
+            <rect class="thumb" x="512.8" y="26" width="30.4" height="54" rx="2"/>
+            <text class="cell-label" x="528" y="100">9:16 tall</text>
+            <rect class="cell" x="628" y="14" width="172" height="96" rx="6"/>
+            <rect class="thumb" x="687" y="26" width="54" height="54" rx="2"/>
+            <text class="cell-label" x="714" y="100">1:1 square</text>
           </g>
         </svg>
       </div>
@@ -718,40 +704,39 @@
             <text class="detail" x="22" y="64">Every finished card reports to the CEO automatically. Verified on the live company with one test card.</text>
 
             <!-- Card flow: DIR, BUILD, ENG, SHIP, RELEASE -->
-            <path class="legend-arrow" d="M68 90 H175"/>
-            <path class="legend-arrow" d="M244 90 H335"/>
-            <path class="legend-arrow" d="M388 90 H495"/>
-            <path class="legend-arrow" d="M556 90 H655"/>
+            <path class="legend-arrow" d="M68 90 H185"/>
+            <path class="legend-arrow" d="M254 90 H345"/>
+            <path class="legend-arrow" d="M398 90 H505"/>
+            <path class="legend-arrow" d="M566 90 H665"/>
             <g class="card-tag" transform="translate(22 80)">
               <rect class="card-tag-box" width="40" height="20" rx="3"/>
               <text class="card-tag-text" x="20" y="14">DIR</text>
             </g>
-            <text class="edge-label" x="22" y="117">CEO sets a goal.</text>
-            <text class="edge-label" x="22" y="132">Product writes a spec.</text>
-            <g class="card-tag" transform="translate(182 80)">
+            <text class="edge-label" x="22" y="117">CEO sets a goal. Product</text>
+            <text class="edge-label" x="22" y="132">writes a spec, DESIGN if UI.</text>
+            <g class="card-tag" transform="translate(192 80)">
               <rect class="card-tag-box" width="56" height="20" rx="3"/>
               <text class="card-tag-text" x="28" y="14">BUILD</text>
             </g>
-            <text class="edge-label" x="182" y="117">Spec to the eng lead,</text>
-            <text class="edge-label" x="182" y="132">DESIGN first if UI.</text>
-            <g class="card-tag" transform="translate(342 80)">
+            <text class="edge-label" x="192" y="117">Spec to the eng lead.</text>
+            <g class="card-tag" transform="translate(352 80)">
               <rect class="card-tag-box" width="40" height="20" rx="3"/>
               <text class="card-tag-text" x="20" y="14">ENG</text>
             </g>
-            <text class="edge-label" x="342" y="117">Tasks to engineers.</text>
-            <text class="edge-label" x="342" y="132">Pull requests into dev.</text>
-            <g class="card-tag" transform="translate(502 80)">
+            <text class="edge-label" x="352" y="117">Tasks to engineers.</text>
+            <text class="edge-label" x="352" y="132">Pull requests into dev.</text>
+            <g class="card-tag" transform="translate(512 80)">
               <rect class="card-tag-box" width="48" height="20" rx="3"/>
               <text class="card-tag-text" x="24" y="14">SHIP</text>
             </g>
-            <text class="edge-label" x="502" y="117">Lead merges to dev,</text>
-            <text class="edge-label" x="502" y="132">deploys staging.</text>
-            <g class="card-tag" transform="translate(662 80)">
+            <text class="edge-label" x="512" y="117">Lead merges to dev,</text>
+            <text class="edge-label" x="512" y="132">deploys staging.</text>
+            <g class="card-tag" transform="translate(672 80)">
               <rect class="card-tag-box" width="72" height="20" rx="3"/>
               <text class="card-tag-text" x="36" y="14">RELEASE</text>
             </g>
-            <text class="edge-label" x="662" y="117">CEO checks the goal.</text>
-            <text class="edge-label" x="662" y="132">Lead promotes to main.</text>
+            <text class="edge-label" x="672" y="117">CEO checks the goal.</text>
+            <text class="edge-label" x="672" y="132">Lead promotes to main.</text>
           </g>
 
           <g data-node="team-engineering" data-chips="bottom" data-show-autonomy transform="translate(384 514)">
@@ -767,8 +752,8 @@
             <text class="name" x="22" y="27"></text>
             <text class="members" x="22" y="48">Product, Design</text>
             <text class="detail" x="22" y="68">Product writes the spec.</text>
-            <text class="detail" x="22" y="85">Design adds a DESIGN card</text>
-            <text class="detail" x="22" y="102">when there is UI.</text>
+            <text class="detail" x="22" y="85">Product opens a DESIGN card</text>
+            <text class="detail" x="22" y="102">for Design when there is UI.</text>
           </g>
           <g data-node="team-gtm" data-chips="bottom" data-show-autonomy transform="translate(892 514)">
             <rect class="card" width="240" height="150" rx="8"/>
@@ -965,7 +950,7 @@ const MAP = {
     { name: 'Lesson cards',         detail: 'Turn mistakes into tested changes to skills.' },
   ],
 
-  /* Open questions. Each shows under Needs you, and on the map wherever it applies. stage
+  /* Open questions. Each shows under Open decisions, and on the map wherever it applies. stage
      says which company stage it could change. Delete one once it is answered, then change
      the stage or the drawing to match the answer. */
   questions: [
@@ -1048,7 +1033,7 @@ const MAP = {
     { id: 'agent-budgets',      name: 'Naive agent budgets',     value: '',                                detail: 'A budget on each agent. GTM agents have none until the product is ready.', status: 'building' },
     { id: 'media-cap',          name: 'Per-run media spend cap', value: '',                                detail: 'Separate cap, because agent budgets do not cap media jobs.', status: 'planned' },
     { id: 'audit-logs',         name: 'Naive audit logs',        value: '',                                detail: 'A record of what the agents did.', status: 'planned' },
-    { id: 'elevenlabs-reserve', name: 'ElevenLabs reserve',      value: '',                                detail: 'Customer films are music-led and readable with sound off. ElevenLabs is kept for the films that matter, such as the demo film. No backup provider.', status: 'planned' },
+    { id: 'elevenlabs-reserve', name: 'ElevenLabs reserve',      value: '',                                detail: 'Customer films are music-led and readable with sound off. ElevenLabs is kept for the films that matter, such as the demo film.', status: 'planned' },
     { id: 'agentmail-plan',     name: 'AgentMail free plan',     value: '3,000 emails a month, 3 inboxes', detail: 'Plan limit.', status: null, label: 'LIMIT' },
   ],
 };
@@ -1263,7 +1248,7 @@ function renderScoreboard() {
     noOwner.length && `No owner chosen yet: ${stageList(noOwner)}`,
   ].filter(Boolean));
   if (openStages.length) {
-    setText('stepins-open', `These may change on ${stageList(openStages)}: see Needs you.`);
+    setText('stepins-open', `These may change on ${stageList(openStages)}: see Open decisions.`);
     document.getElementById('stepins-open').hidden = false;
   }
 }
