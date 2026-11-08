@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Making the film</title>
+<link rel="icon" href="../../design-system/logo/boiler-mark.svg">
+<link rel="stylesheet" href="../../design-system/tokens.css">
+<link rel="stylesheet" href="../../design-system/components.css">
+<link rel="stylesheet" href="loops.css">
+<script src="../../design-system/icons/icons.js"></script>
+<script src="loops.js"></script>
+</head>
+<body>
+<div class="stage" id="stage">
+  <header class="stage-head">
+    <img class="pixel" src="../../design-system/logo/lockup.svg" width="124" height="48" alt="Boiler Room">
+    <div class="titles">
+      <span class="label eyebrow"><b>01</b> Loop one · the product</span>
+      <h1>How a URL becomes a launch film</h1>
+      <p class="sub">The production crew: five agents, one file and one human step. Badges show what runs today.</p>
+    </div>
+    <div class="right">
+      <nav class="loop-tabs" aria-label="Loops">
+        <a href="production-loop.html" aria-current="page">1 · Making the film</a>
+        <a href="company-loop.html">2 · Running the company</a>
+      </nav>
+      <div class="legend">
+        <div><span class="swatch main"></span>Main line</div>
+        <div><span class="swatch back"></span>Sent back to fix</div>
+        <div><span class="swatch person"></span>A person acts</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="stage-note contract card card-cream card-flat" style="left: 430px; top: 445px">
+    <img src="../../design-system/logo/boiler-mark.svg" alt="">
+    <p>Every step reads and writes one file: <code>campaign.json</code></p>
+  </div>
+</div>
+
+<script>
+BRLoop({
+  start: 'url',
+  stations: [
+    { id: 'url',        x: 190,  y: 320, icon: 'globe',   name: 'Your URL',        what: 'nova.example.com',       kind: 'start' },
+    { id: 'researcher', x: 495,  y: 320, icon: 'search',  name: 'Researcher',      what: 'reads the site',         status: 'building' },
+    { id: 'director',   x: 800,  y: 320, icon: 'clapper', name: 'Director',        what: 'writes the script',      status: 'building' },
+    { id: 'validator',  x: 1105, y: 320, icon: 'shield',  name: 'Validator',       what: 'plain code, no AI',      status: 'live', kind: 'code' },
+    { id: 'approve',    x: 1410, y: 320, icon: 'user',    name: 'You approve',     what: 'the one human step',     status: 'building', kind: 'human' },
+    { id: 'artdir',     x: 1410, y: 570, icon: 'brush',   name: 'Art Director',    what: 'picks the look',         status: 'building' },
+    { id: 'render',     x: 1105, y: 570, icon: 'gear',    name: 'Render',          what: 'Remotion on Naive',      status: 'live', kind: 'code' },
+    { id: 'qc',         x: 800,  y: 570, icon: 'eye',     name: 'Quality Check',   what: 'watches every frame',    status: 'building' },
+    { id: 'am',         x: 495,  y: 570, icon: 'mail',    name: 'Account Manager', what: 'delivers and revises',   status: 'planned' },
+    { id: 'done',       x: 190,  y: 570, icon: 'play',    name: 'Launch film',     what: 'up to 18 videos',        kind: 'end' },
+  ],
+  pipes: [
+    { id: 'p1', from: 'url', to: 'researcher' },
+    { id: 'p2', from: 'researcher', to: 'director' },
+    { id: 'p3', from: 'director', to: 'validator' },
+    { id: 'p4', from: 'validator', to: 'approve' },
+    { id: 'p5', from: 'approve', to: 'artdir' },
+    { id: 'p6', from: 'artdir', to: 'render' },
+    { id: 'p7', from: 'render', to: 'qc' },
+    { id: 'p8', from: 'qc', to: 'am' },
+    { id: 'p9', from: 'am', to: 'done' },
+    { id: 'v2d', kind: 'back', points: [[1105, 264], [1105, 206], [800, 206], [800, 264]], label: 'fix this', labelAt: [952, 206] },
+    { id: 'qc2d', kind: 'back', points: [[800, 514], [800, 376]], label: 'send back', labelAt: [800, 445] },
+    { id: 'qc2a', kind: 'back', points: [[800, 626], [800, 686], [1410, 686], [1410, 626]], label: 'send back', labelAt: [1105, 686] },
+  ],
+  steps: [
+    { to: 'url', carry: '', hold: 42, verdict: ['human', 'Launching Tuesday'],
+      title: 'A founder pastes a URL',
+      text: "That's the whole brief. Everything in the film comes from the founder's own website." },
+    { to: 'researcher', carry: 'nova.example.com', carryIcon: 'globe', verdict: ['work', '4 claims found'],
+      title: 'The Researcher reads the site',
+      text: 'A robot browser takes screenshots, the colours, fonts and logo, and copies every claim word for word, with the page it came from.' },
+    { to: 'director', carry: 'research.json', verdict: ['work', '4 scenes · 20s'],
+      title: 'The Director writes the script',
+      text: 'Scenes, timing, on-screen text and voiceover go into one file, campaign.json. Every number has to cite a claim.' },
+    { to: 'validator', carry: 'campaign.json', verdict: ['fail', '73% has no source'],
+      title: 'The Validator checks every number',
+      text: 'Plain code, not AI. "Builds 73% faster" has no quote behind it, so the script is rejected, with the exact fix.' },
+    { to: 'director', via: 'v2d', carry: 'fix: 73% has no source', carryIcon: 'warning', tone: 'fail', verdict: ['work', 'rewriting scene 2'],
+      title: 'Sent back to the Director',
+      text: 'The Director rewrites the line from a real quote, "40% faster builds". Then it goes through the Validator again.' },
+    { to: 'validator', carry: 'campaign.json v2', verdict: ['pass', 'passed'],
+      title: 'Passed',
+      text: "Every number now points to a sentence on the founder's own site." },
+    { to: 'approve', carry: 'script + sources', carryIcon: 'user', tone: 'human', verdict: ['human', 'approved'],
+      title: 'The founder approves the script',
+      text: 'The one human step. They read the script and the source behind each number. Nothing renders until they say yes.' },
+    { to: 'artdir', carry: 'approved script', carryIcon: 'check', verdict: ['work', '4 templates'],
+      title: 'The Art Director picks the look',
+      text: 'An animation template for every scene, in the brand it found on the site, and generated images for anything missing.' },
+    { to: 'render', carry: 'scene picks', meter: true, verdict: ['work', 'rendering'],
+      title: 'Render',
+      text: 'Remotion turns campaign.json into video, in chunks on Naive computers, then stitches the chunks together.' },
+    { to: 'qc', carry: 'video files', carryIcon: 'film', verdict: ['pass', 'pass'], hint: ['qc2d', 'qc2a'],
+      title: 'Quality Check watches it',
+      text: 'Every transition, every line at phone size, the brand and the claims. A problem goes back to the Director or the Art Director.' },
+    { to: 'am', carry: 'review: pass', carryIcon: 'check', tone: 'pass', verdict: ['work', 'email sent'],
+      title: 'The Account Manager delivers',
+      text: 'The founder gets an email with a link to the files, and asks for changes by replying.' },
+    { to: 'done', carry: '18 videos', carryIcon: 'play', tone: 'pass', hold: 60, verdict: ['pass', 'ready to post'],
+      title: 'Ready for launch day',
+      text: 'Up to 18 videos: 3 opening hooks, 3 shapes for every channel and 2 calls to action.' },
+  ],
+});
+</script>
+</body>
+</html>

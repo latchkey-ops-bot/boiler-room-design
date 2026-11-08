@@ -5,3 +5,4 @@ Boiler Room design system: brand, tokens, components, website and dashboard.
 
 - [Design system](DESIGN.md): the logo, colours, type, pixel rules and sample pages. Open `design-system/index.html` to see it.
 - [System map](docs/system-map/README.md): how Boiler Room works and how autonomously the company runs.
+- [The two loops](docs/loops/README.md): animated diagrams of how a film gets made and how the company runs itself, for presenting.

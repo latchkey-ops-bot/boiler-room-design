@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Running the company</title>
+<link rel="icon" href="../../design-system/logo/boiler-mark.svg">
+<link rel="stylesheet" href="../../design-system/tokens.css">
+<link rel="stylesheet" href="../../design-system/components.css">
+<link rel="stylesheet" href="loops.css">
+<script src="../../design-system/icons/icons.js"></script>
+<script src="loops.js"></script>
+</head>
+<body>
+<div class="stage" id="stage">
+  <header class="stage-head">
+    <img class="pixel" src="../../design-system/logo/lockup.svg" width="124" height="48" alt="Boiler Room">
+    <div class="titles">
+      <span class="label eyebrow"><b>02</b> Loop two · the company</span>
+      <h1>How the company runs itself</h1>
+      <p class="sub">One board, one CEO agent and three teams on Naive. The design: the CEO's schedule is paused while the teams are built.</p>
+    </div>
+    <div class="right">
+      <nav class="loop-tabs" aria-label="Loops">
+        <a href="production-loop.html">1 · Making the film</a>
+        <a href="company-loop.html" aria-current="page">2 · Running the company</a>
+      </nav>
+      <span class="badge badge-needs">The founder: accounts, sign-ins and money only</span>
+    </div>
+  </header>
+</div>
+
+<script>
+BRLoop({
+  start: 'ceo',
+  board: { x: 800, y: 450, title: 'The company board', note: 'every move is a card' },
+  stations: [
+    { id: 'ceo',       x: 290,  y: 275, icon: 'crown',    name: 'CEO agent', what: 'sets the goal',          status: 'building' },
+    { id: 'product',   x: 800,  y: 275, icon: 'doc',      name: 'Product',   what: 'writes the spec',        status: 'building' },
+    { id: 'design',    x: 1310, y: 275, icon: 'brush',    name: 'Design',    what: 'draws the screens',      status: 'building' },
+    { id: 'plan',      x: 1310, y: 450, icon: 'clapper',  name: 'Eng lead',  what: 'plans the work',         status: 'building' },
+    { id: 'engineers', x: 1310, y: 625, icon: 'terminal', name: 'Engineers', what: 'write the code',         status: 'building' },
+    { id: 'ship',      x: 800,  y: 625, icon: 'check',    name: 'Eng lead',  what: 'reviews and ships',      status: 'building' },
+    { id: 'check',     x: 290,  y: 625, icon: 'eye',      name: 'CEO agent', what: 'checks the goal',        status: 'building' },
+    { id: 'release',   x: 290,  y: 450, icon: 'rocket',   name: 'Eng lead',  what: 'releases to production', status: 'building' },
+  ],
+  pipes: [
+    { id: 'c1', from: 'ceo', to: 'product' },
+    { id: 'c2', from: 'product', to: 'design' },
+    { id: 'c3', from: 'design', to: 'plan' },
+    { id: 'c4', from: 'plan', to: 'engineers' },
+    { id: 'c5', from: 'engineers', to: 'ship' },
+    { id: 'c6', from: 'ship', to: 'check' },
+    { id: 'c7', from: 'check', to: 'release' },
+    { id: 'c8', from: 'release', to: 'ceo' },
+  ],
+  steps: [
+    { to: 'ceo', verdict: ['work', 'reading the board'],
+      board: { card: 'DIR: launch-countdown', who: 'to Product', log: 'CEO sweep: one new goal' },
+      title: 'The CEO agent wakes up',
+      text: 'Every 2 hours it reads the company board and picks the goal that matters most. Then it writes that goal on a card.' },
+    { to: 'product', carry: 'DIR: launch-countdown', verdict: ['work', 'spec written'],
+      board: { card: 'DESIGN: launch-countdown', who: 'to Design', log: 'Spec written for the goal' },
+      title: 'Product writes the spec',
+      text: 'Who has the problem, what "done" looks like, and checks anyone can run. Then it opens a design card and a build card.' },
+    { to: 'design', carry: 'DESIGN card', verdict: ['work', '3 screens drawn'],
+      board: { card: 'BUILD: launch-countdown', who: 'to Eng lead', log: 'Screens done, build unblocked' },
+      title: 'Design draws the screens',
+      text: 'Screens, states and copy in the design system, pushed to the design repo. Finishing them unblocks the build card.' },
+    { to: 'plan', carry: 'BUILD card', verdict: ['work', '2 tasks + SHIP'],
+      board: { card: 'ENG 1/2 · ENG 2/2', who: 'to Engineers', log: 'Build split into 2 tasks' },
+      title: 'The engineering lead plans',
+      text: 'It splits the build into task cards for the engineers, in order, plus one SHIP card for itself that waits for all of them.' },
+    { to: 'engineers', carry: 'ENG 1/2 · ENG 2/2', verdict: ['pass', 'tests pass'],
+      board: { card: 'SHIP: launch-countdown', who: 'to Eng lead', log: '2 pull requests into dev' },
+      title: 'Engineers write the code',
+      text: 'Each task becomes a branch and a pull request into dev. Tests, type checks and lint must pass before the card is done.' },
+    { to: 'ship', carry: '2 pull requests', carryIcon: 'terminal', verdict: ['pass', 'on staging'],
+      board: { card: 'SHIP report', who: 'to CEO', log: 'Merged and on staging' },
+      title: 'The lead reviews and ships to staging',
+      text: 'It checks each pull request against the spec, merges into dev, deploys staging and runs a smoke check. A bad one gets a fix card.' },
+    { to: 'check', carry: 'SHIP report', verdict: ['pass', 'goal delivered'],
+      board: { card: 'RELEASE: launch-countdown', who: 'to Eng lead', log: 'CEO: goal delivered' },
+      title: 'The CEO checks the goal',
+      text: "Every finished card reports to the CEO automatically. It compares the result with the goal's definition of done." },
+    { to: 'release', carry: 'RELEASE card', carryIcon: 'rocket', tone: 'pass', verdict: ['pass', 'live'],
+      board: { card: 'Next sweep in 2 hours', who: 'to CEO', log: 'Live in production' },
+      title: 'Release to production',
+      text: 'The lead promotes dev to main through a pull request and deploys production, with checks and a rollback. No person approves it.' },
+    { to: 'ceo', carry: 'next sweep', carryIcon: 'clock', hold: 60, verdict: ['work', 'next goal'],
+      board: { card: 'DIR: the next goal', who: 'to Product', log: 'Loop complete' },
+      title: 'And around again',
+      text: 'The next sweep picks the next goal. A person steps in only for what an agent cannot do: an account, a sign-in, credit or a budget.' },
+  ],
+});
+</script>
+</body>
+</html>
