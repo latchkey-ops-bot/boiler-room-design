@@ -540,7 +540,7 @@
           <g data-node="motion-library" data-chips="top" transform="translate(396 798)">
             <rect class="card" width="440" height="88" rx="8"/>
             <text class="name" x="46" y="25"></text>
-            <text class="detail" x="22" y="45"><tspan class="mono">packages/motion</tspan>: Remotion. Merged, live for 4 of 15 scene types:</text>
+            <text class="detail" x="22" y="45"><tspan class="mono">packages/motion</tspan>: merged, live for 4 of 15 scene types:</text>
             <text class="detail" x="22" y="62">word-slam, site-hero, feature-card and end-card. Building now:</text>
             <text class="detail" x="22" y="79">7 more scene types and the measured transitions.</text>
           </g>
@@ -581,7 +581,7 @@
             <rect class="card" width="280" height="104" rx="8"/>
             <text class="name" x="22" y="25"></text>
             <text class="detail" x="22" y="46"><tspan class="mono">packages/schema</tspan>: the format the</text>
-            <text class="detail" x="22" y="63">Director writes and the Validator checks.</text>
+            <text class="detail" x="22" y="63">Director writes, the Validator checks.</text>
           </g>
           <g data-node="elevenlabs" data-chips="bottom" transform="translate(24 914)">
             <rect class="card" width="280" height="104" rx="8"/>
@@ -607,13 +607,12 @@
             <rect class="card" width="280" height="104" rx="8"/>
             <text class="name" x="22" y="25"></text>
             <text class="detail" x="22" y="46">Cloudflare D1, live on staging.</text>
-            <text class="detail" x="22" y="63">R2 stores the films.</text>
+            <text class="detail" x="22" y="63">R2 for film storage.</text>
           </g>
           <g data-node="render-host" data-chips="bottom" transform="translate(928 1038)">
             <rect class="card" width="280" height="104" rx="8"/>
             <text class="name" x="22" y="25"></text>
             <text class="detail" x="22" y="46">Naive computers, real renders verified.</text>
-            <text class="detail" x="22" y="63">A film split across them joins cleanly.</text>
           </g>
 
           <!-- Editing -->
@@ -966,7 +965,7 @@ const MAP = {
   counters: { filmsDelivered: 0, leadsFound: 0, emailsSent: 0, replies: 0, boardCardsCompleted: 1 },
 
   /* What comes next for the product, as ids from the lists below, in order. */
-  next: ['first-film', 'one-command', 'scene-components'],
+  next: ['first-film', 'one-command'],
 
   /* What comes next for the company, in order. Shown under Next and in its own panel. */
   companyNext: [
@@ -994,7 +993,7 @@ const MAP = {
     { id: 'researcher',       name: 'Researcher agent',        status: 'building', autonomy: 'agent',    step: 1 },
     { id: 'director',         name: 'Director agent',          status: 'building', autonomy: 'agent',    step: 2 },
     { id: 'validator',        name: 'Validator',               status: 'live',     autonomy: null,       step: 3 },
-    { id: 'script-approval',  name: 'Script approval',         status: 'planned',  autonomy: 'customer', step: 4 },
+    { id: 'script-approval',  name: 'Script approval',         status: 'building', autonomy: 'customer', step: 4 },
     { id: 'art-director',     name: 'Art Director agent',      status: 'building', autonomy: 'agent',    step: 5 },
     { id: 'motion-library',   name: 'Motion library',          status: 'live',     autonomy: null,       step: 6 },
     { id: 'audio',            name: 'Audio',                   status: 'planned',  autonomy: null,       step: 7 },
@@ -1046,27 +1045,22 @@ const MAP = {
 
   /* What each team can use. label marks a team that is not fully running yet, such as DRY RUN. */
   tools: [
-    { team: 'Engineering',        tools: ['Repo access through a GitHub token on its computers', 'Bash', 'Cloudflare deploy, rollback, migration and log commands', 'The engineering skill: deploying releases and bug fixes'], note: 'Clerk keys are app secrets that agents never hold.' },
+    { team: 'Engineering',        tools: ['Both repos, through pull requests', 'Bash', 'Cloudflare deploy, rollback, migration and log commands', 'The engineering skill: deploying releases and bug fixes'] },
     { team: 'Product and design', tools: ['The design repo', 'Image generation'] },
-    { team: 'GTM',                tools: ['A Boiler Room app account, to make free sample films', 'X, to quote-post a launch post with its film: needs a connected X account', 'AgentMail, for cold email with a film link', 'Naive lead data'], note: 'Agents decide on the board and code sends.', label: 'DRY RUN' },
+    { team: 'GTM',                tools: ['A Boiler Room app account, to make free sample films', 'X, to quote-post a launch post with its film: needs a connected X account', 'AgentMail, for cold email with a film link'], note: 'Agents decide on the board and code sends.', label: 'DRY RUN' },
     { team: 'CEO',                tools: ['The board and its skill'], note: 'Every admin tool it would otherwise get as the account CEO is denied by name.' },
   ],
 
   /* Guard rails. status null means a rule or a limit, not something being built: label says
      which. This repo is public: no account balances or credit counts here. */
   guardRails: [
-    { id: 'untrusted-content',  name: 'Untrusted content',       value: '',                                detail: 'Agents that read untrusted content, like inbound email, social comments or customer websites, cannot push code, deploy or spend.', status: null, label: 'RULE' },
     { id: 'ship-path',          name: 'Path to production',      value: '',                                detail: 'Engineers open pull requests into dev that must pass tests. When a goal is delivered, the CEO creates a RELEASE card; the engineering lead promotes dev to main through a pull request and deploys production, with checks and rollback. Nobody else may touch main or production.', status: null, label: 'RULE' },
     { id: 'branch-rules',       name: 'Branch rules',            value: '',                                detail: 'On main and dev, in both repos: a pull request is required, with no force push and no deletion.', status: null, label: 'RULE' },
     { id: 'ceo-tools',          name: 'CEO tools',               value: '',                                detail: 'Every one of the hundreds of admin tools the account CEO would otherwise get is denied by name. It is offered only the board and its skill.', status: null, label: 'RULE' },
     { id: 'crew-cards',         name: 'Crew and company cards',  value: '',                                detail: 'Production crew agents cannot write company cards.', status: null, label: 'RULE' },
     { id: 'gtm-dry-run',        name: 'GTM dry run',             value: '',                                detail: 'GTM agents decide on the board and code sends. They post and send nothing until activated.', status: null, label: 'RULE' },
-    { id: 'app-secrets',        name: 'App secrets',             value: '',                                detail: 'Clerk keys are app secrets that agents never hold.', status: null, label: 'RULE' },
     { id: 'claims-gate',        name: 'Claims gate',             value: '',                                detail: 'The Validator rejects invented numbers before script approval. Whether exported edits pass it too is still open.', status: 'live' },
-    { id: 'agent-budgets',      name: 'Naive agent budgets',     value: '',                                detail: 'A budget on each agent. GTM agents have none until they are activated.', status: 'building' },
-    { id: 'media-cap',          name: 'Per-run media spend cap', value: '',                                detail: 'Separate cap, because agent budgets do not cap media jobs.', status: 'planned' },
-    { id: 'audit-logs',         name: 'Naive audit logs',        value: '',                                detail: 'A record of what the agents did.', status: 'planned' },
-    { id: 'elevenlabs-reserve', name: 'ElevenLabs reserve',      value: '',                                detail: 'Customer films are music-led and readable with sound off. ElevenLabs is kept for the films that matter, such as the demo film.', status: 'planned' },
+    { id: 'elevenlabs-reserve', name: 'ElevenLabs reserve',      value: '',                                detail: 'Customer films are music-led and readable with sound off. ElevenLabs is kept for the films that matter, such as the demo film.', status: null, label: 'RULE' },
     { id: 'agentmail-plan',     name: 'AgentMail free plan',     value: '3,000 emails a month, 3 inboxes', detail: 'Plan limit.', status: null, label: 'LIMIT' },
   ],
 };

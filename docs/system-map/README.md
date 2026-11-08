@@ -11,9 +11,9 @@ Most of the eleven-stage loop is still the design, not what runs today. The scor
 As of 2026-11-08:
 
 - **Live:** Naive account, Validator, Motion library, Render service, `campaign.json` contract, Scene specs and crew skills, ElevenLabs account, Render host, Data store, AgentMail inbox, Company board, Claims gate
-- **Building:** First real film, Website and app, Scout agent, Researcher agent, Director agent, Art Director agent, Quality Check agent, Find leads, Qualify, Make a sample film, Send outreach, Handle replies, Customer intake, Produce the film, Report, CEO agent, Engineering, Product and design, GTM, Naive agent budgets
+- **Building:** First real film, Website and app, Scout agent, Researcher agent, Director agent, Script approval, Art Director agent, Quality Check agent, Find leads, Qualify, Make a sample film, Send outreach, Handle replies, Customer intake, Produce the film, Report, CEO agent, Engineering, Product and design, GTM
 - **Open decisions:** Get paid, and whether exported edits go back through the Validator
-- **Next:** First real film, One command, URL to film, Long-film scenes, GTM activation, Test suites per role, Outcome grading, Company scorecard, Lesson cards
+- **Next:** First real film, One command, URL to film, GTM activation, Test suites per role, Outcome grading, Company scorecard, Lesson cards
 
 The website, app, backend and database run on Cloudflare: Next.js on Cloudflare Workers, the D1 database, R2 film storage and Clerk sign-in on a development instance. The website and app are one app, live on staging. It is marked building because it runs a simulated pipeline, clearly labelled, until the real pipeline is connected. Production is not deployed yet. The agents and the renders run on Naive.
 
@@ -25,9 +25,9 @@ Click any image below to open it at full size. This first one stays readable at 
 
 This is the production crew: the product's own runtime, maintained by engineering and separate from the company's chain of command. Crew agents cannot write company cards. Both ways in feed one ten-step pipeline. The customer way in is the website and app on Cloudflare. Scout, the way in for leads, is a company GTM agent from Diagram 2, not part of the crew. The heavy dashed arrows are the two feedback loops. A customer approves the script of their own film in the app's script review, which shows every claim's source; for a sample film, agents decide. The DECIDE marker on the export arrow is an open question: whether an exported edit passes the Validator first.
 
-The Researcher, Director, Art Director and Quality Check agents are all being built, each with an open pull request. The Researcher runs alone on any site, ignored planted instructions and quotes claims verbatim; a fix round on summary accuracy, pop-up colours and URL safety is under way. The Director runs on Opus. The first autonomous run went from Linear's website to a validated 45-second, 18-scene script with no human step.
+The Researcher, Director, Art Director and Quality Check agents are all being built, with open pull requests. The Researcher runs alone on any site, ignored planted instructions and quotes claims verbatim; a fix round on summary accuracy, pop-up colours and URL safety is under way. The Director runs on Opus. The first autonomous run went from Linear's website to a validated 45-second, 18-scene script with no human step.
 
-The motion library is merged and live for 4 of the 15 scene types: word-slam, site-hero, feature-card and end-card. Seven more scene types and the measured transitions are being built now. The 4 long-film scenes are reserved for the company's engineers. The render service is merged and makes real renders on Naive computers. The scene specs and the crew skills are merged. The first real rendered film is next, and one command from URL to film is planned. The data store is Cloudflare D1, live on staging, and the films go to R2. The AgentMail inbox is live with the sender name Boiler Room.
+The motion library is merged and live for 4 of the 15 scene types: word-slam, site-hero, feature-card and end-card. Seven more scene types and the measured transitions are being built now. The 4 long-film scenes are reserved for the company's engineers. The render service is merged and makes real renders on Naive computers. The scene specs and the crew skills are merged. The first real rendered film is next, and one command from URL to film is planned. The data store is Cloudflare D1, live on staging, and films will be stored in R2. The AgentMail inbox is live with the sender name Boiler Room.
 
 ![Diagram 1: the ten-step pipeline, the systems it uses, and the two feedback loops](technical.png)
 
@@ -46,7 +46,7 @@ Work moves by card:
 | `DIR` | The CEO sets a goal. Product writes a spec, and opens a `DESIGN` card for Design if there is UI. |
 | `BUILD` | The spec goes to the engineering lead. |
 | `ENG` | The lead hands tasks to engineers, who open pull requests into dev that must pass tests. |
-| `SHIP` | Back to the lead, who merges into dev and deploys staging. The CEO then checks it against the goal. |
+| `SHIP` | Back to the lead, who merges into dev and deploys staging. |
 | `RELEASE` | When a goal is delivered, the CEO creates a release card. The engineering lead promotes dev to main through a pull request and deploys production, with checks and rollback. |
 
 Releases are autonomous. Only the engineering lead may touch main or production. Branch rules on main and dev, in both repos, require a pull request and forbid force pushes and deletion.
